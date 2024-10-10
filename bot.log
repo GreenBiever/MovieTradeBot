@@ -1,0 +1,444 @@
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000248892FEE40>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x00000248892F4710>, 116067.109)]']
+connector: <aiohttp.connector.TCPConnector object at 0x000002488B1FF950>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001C86544EBD0>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x000001C8654646B0>, 116094.531)]']
+connector: <aiohttp.connector.TCPConnector object at 0x000001C86544E810>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001F35DD1AE40>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x000001F35DD10830>, 116215.484)]']
+connector: <aiohttp.connector.TCPConnector object at 0x000001F35DD1AE10>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000016BF782ED80>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x0000016BF7828770>, 116248.078)]']
+connector: <aiohttp.connector.TCPConnector object at 0x0000016BF782ED50>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002B4BA5B2D20>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x000002B4BA5AC650>, 116344.968)]']
+connector: <aiohttp.connector.TCPConnector object at 0x000002B4BA5B2CF0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002306747AD50>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x0000023067470770>, 116387.75)]']
+connector: <aiohttp.connector.TCPConnector object at 0x000002306747AD20>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000294D9C3AD80>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x00000294D9C50650>, 116494.656)]']
+connector: <aiohttp.connector.TCPConnector object at 0x00000294D9C3AD50>
+INFO:root:New user
+INFO:aiogram.event:Update id=27486273 is handled. Duration 203 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486274 is handled. Duration 141 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486275 is handled. Duration 125 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486276 is handled. Duration 187 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486277 is handled. Duration 94 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486278 is handled. Duration 108 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486279 is handled. Duration 94 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486280 is handled. Duration 109 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486281 is handled. Duration 125 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486282 is handled. Duration 125 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486283 is handled. Duration 94 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486284 is handled. Duration 125 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486285 is handled. Duration 139 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486286 is handled. Duration 125 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486287 is handled. Duration 94 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486288 is handled. Duration 3141 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486289 is handled. Duration 156 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486290 is handled. Duration 141 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486291 is handled. Duration 125 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486292 is handled. Duration 125 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486293 is handled. Duration 141 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486294 is handled. Duration 94 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486295 is handled. Duration 125 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486296 is handled. Duration 125 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486297 is handled. Duration 92 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486298 is handled. Duration 219 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486299 is handled. Duration 266 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486300 is handled. Duration 250 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486301 is handled. Duration 155 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486302 is handled. Duration 344 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486303 is handled. Duration 3234 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486304 is handled. Duration 108 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486305 is handled. Duration 94 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486306 is handled. Duration 156 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486307 is handled. Duration 109 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486308 is handled. Duration 108 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486309 is handled. Duration 108 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486310 is handled. Duration 156 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486311 is handled. Duration 125 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486312 is handled. Duration 93 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486313 is handled. Duration 94 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486314 is handled. Duration 109 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486315 is handled. Duration 108 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486316 is handled. Duration 110 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486317 is handled. Duration 93 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486318 is handled. Duration 3109 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001FE54369610>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x000001FE52526810>, 157166.062)]']
+connector: <aiohttp.connector.TCPConnector object at 0x000001FE524F8E60>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001FE524E6750>
+INFO:aiogram.event:Update id=27486319 is handled. Duration 264 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000236F4544260>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001882A288DD0>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x000001882A2C6870>, 157680.046)]']
+connector: <aiohttp.connector.TCPConnector object at 0x000001882A288DA0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001882A2A26F0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000012A55B18B60>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x0000012A55B46330>, 157811.875)]']
+connector: <aiohttp.connector.TCPConnector object at 0x0000012A55B18B30>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000012A57A02390>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000024DDC878AD0>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x0000024DDC8A67B0>, 157897.078)]']
+connector: <aiohttp.connector.TCPConnector object at 0x0000024DDC878AA0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000024DDDBE23F0>
+INFO:aiogram.event:Update id=27486320 is handled. Duration 141 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486321 is not handled. Duration 0 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001934EA16720>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000022B96288BC0>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x0000022B962C69F0>, 158306.312)]']
+connector: <aiohttp.connector.TCPConnector object at 0x0000022B96288B90>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000022B9760B380>
+INFO:aiogram.event:Update id=27486322 is handled. Duration 187 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000216575C8FB0>
+INFO:aiogram.event:Update id=27486323 is handled. Duration 217 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001E550276DB0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001CD10220D40>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x000001CD10253230>, 159691.921)]']
+connector: <aiohttp.connector.TCPConnector object at 0x000001CD10220D10>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001CD1020AAB0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000182E71DCC20>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x00000182E71F2AB0>, 159796.234)]']
+connector: <aiohttp.connector.TCPConnector object at 0x00000182E71DCB30>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000182E91008C0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000218D81891F0>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x00000218DA263770>, 160189.265)]']
+connector: <aiohttp.connector.TCPConnector object at 0x00000218D81891C0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000218DA0B1C40>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002DE2FA3D280>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x000002DE31AF2030>, 165413.593)]']
+connector: <aiohttp.connector.TCPConnector object at 0x000002DE2FA3D250>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002DE317DAF30>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000015059EEA3F0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001505AC22B10>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x000001505AC0BA10>, 244952.656)]']
+connector: <aiohttp.connector.TCPConnector object at 0x000001505AC22AE0>
+INFO:aiogram.event:Update id=27486324 is not handled. Duration 15 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486324 is not handled. Duration 0 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486324 is not handled. Duration 0 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486324 is not handled. Duration 0 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486324 is not handled. Duration 15 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486324 is not handled. Duration 16 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486324 is not handled. Duration 15 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486324 is not handled. Duration 14 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000021DC4511D90>
+INFO:aiogram.event:Update id=27486324 is not handled. Duration 15 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486324 is not handled. Duration 15 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486324 is not handled. Duration 0 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486324 is not handled. Duration 16 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002B84E090C50>
+INFO:root:New user
+INFO:aiogram.event:Update id=27486324 is handled. Duration 125 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486325 is handled. Duration 46 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002A4E4591D30>
+INFO:aiogram.event:Update id=27486326 is handled. Duration 125 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000026B76E5A270>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000027B4D888440>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x0000027B4DAA2E70>, 252410.953)]']
+connector: <aiohttp.connector.TCPConnector object at 0x0000027B4D9DB620>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000027B4D9C2390>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000284469E3A40>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x00000284469D3FB0>, 252697.984)]']
+connector: <aiohttp.connector.TCPConnector object at 0x0000028445CD86B0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000028445C9A1B0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000172623238F0>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x00000172622FFF50>, 252762.437)]']
+connector: <aiohttp.connector.TCPConnector object at 0x00000172623238C0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000172622F36B0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001EB32703950>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x000001EB32814D70>, 252889.39)]']
+connector: <aiohttp.connector.TCPConnector object at 0x000001EB32701280>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001EB326D39B0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000023798F9B9E0>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x0000023798FD4050>, 252925.0)]']
+connector: <aiohttp.connector.TCPConnector object at 0x0000023798F9B9B0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002379826B680>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000023798FB38C0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002279895BAD0>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x0000022798947F50>, 252990.281)]']
+connector: <aiohttp.connector.TCPConnector object at 0x0000022797C686B0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000022798933F20>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000022798977380>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000016A52C23AA0>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x0000016A52D05F10>, 253094.718)]']
+connector: <aiohttp.connector.TCPConnector object at 0x0000016A52C23A70>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000016A52A99F70>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000016A52C0C3E0>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x0000016A52D05430>, 253087.125)]']
+connector: <aiohttp.connector.TCPConnector object at 0x0000016A52A98080>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001A322583CB0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001A3226E3830>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x000001A3226CFBF0>, 253660.546)]']
+connector: <aiohttp.connector.TCPConnector object at 0x000001A3226C9280>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000029694D39EB0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000029694EC38C0>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x0000029694EABD70>, 253708.609)]']
+connector: <aiohttp.connector.TCPConnector object at 0x0000029694EC3890>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000273A090C410>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000273A09239E0>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x00000273A090BE90>, 253729.328)]']
+connector: <aiohttp.connector.TCPConnector object at 0x00000273A09239B0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000025B20CD8530>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000025B219738F0>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x0000025B2195BFB0>, 253790.984)]']
+connector: <aiohttp.connector.TCPConnector object at 0x0000025B219738C0>
+INFO:aiogram.event:Update id=27486327 is handled. Duration 108 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000243673CB140>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000243681AB8F0>
+INFO:aiogram.event:Update id=27486328 is handled. Duration 187 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000255EFD170B0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000255EFC33B00>
+INFO:aiogram.event:Update id=27486329 is handled. Duration 187 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000023975BD9250>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000023976993AD0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000022F8D5388F0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000022F8E1F0530>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x0000022F8E1EBFB0>, 335602.203)]']
+connector: <aiohttp.connector.TCPConnector object at 0x0000022F8E207EC0>
+INFO:aiogram.event:Update id=27486330 is handled. Duration 93 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486331 is handled. Duration 125 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000016B9C7E7FE0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000016B9C8B0050>
+INFO:aiogram.event:Update id=27486332 is handled. Duration 266 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000025CA0A0C0E0>
+INFO:aiogram.event:Update id=27486333 is handled. Duration 79 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000213F7E13CB0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001B43ABA3E60>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001B43ABDC200>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x000001B43ABBBFB0>, 421468.515)]']
+connector: <aiohttp.connector.TCPConnector object at 0x000001B43ABDC1D0>
+INFO:aiogram.event:Update id=27486334 is handled. Duration 108 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000021928B125A0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000016DCBF07EC0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000016DCC05BFE0>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x0000016DCBEC4290>, 421513.625)]']
+connector: <aiohttp.connector.TCPConnector object at 0x0000016DCC05BF80>
+INFO:aiogram.event:Update id=27486335 is handled. Duration 108 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000246A85E08C0>
+INFO:aiogram.event:Update id=27486336 is handled. Duration 77 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001D057BF7080>
+INFO:aiogram.event:Update id=27486337 is handled. Duration 157 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001E43BCF0140>
+INFO:aiogram.event:Update id=27486338 is handled. Duration 157 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002541E5E32F0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002028A78C1A0>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x000002028A7C9BB0>, 421929.468)]']
+connector: <aiohttp.connector.TCPConnector object at 0x000002028A78C170>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002028A4715B0>
+INFO:aiogram.event:Update id=27486339 is handled. Duration 93 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001AC9AAAD9A0>
+INFO:aiogram.event:Update id=27486340 is handled. Duration 109 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486341 is handled. Duration 61 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002DE294397C0>
+INFO:aiogram.event:Update id=27486342 is handled. Duration 92 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486343 is handled. Duration 46 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001D7ADAD3260>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000209F63FC050>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x00000209F6439BB0>, 422096.64)]']
+connector: <aiohttp.connector.TCPConnector object at 0x00000209F63EBFE0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000209F63C20F0>
+INFO:aiogram.event:Update id=27486344 is handled. Duration 78 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001ED51B71970>
+INFO:aiogram.event:Update id=27486345 is handled. Duration 171 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486346 is handled. Duration 45 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486347 is handled. Duration 63 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002565A757F20>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002565A817860>
+INFO:aiogram.event:Update id=27486348 is handled. Duration 92 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001B71BE945C0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001B71C138AA0>
+INFO:aiogram.event:Update id=27486349 is handled. Duration 93 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000016B8B2562A0>
+INFO:aiogram.event:Update id=27486350 is handled. Duration 125 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000175335811F0>
+INFO:aiogram.event:Update id=27486351 is handled. Duration 77 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001D029E198E0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001D02ABF02F0>
+INFO:aiogram.event:Update id=27486352 is handled. Duration 108 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000018ED2FDBCB0>
+INFO:aiogram.event:Update id=27486353 is handled. Duration 156 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001324D952090>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000019ED8EEE0C0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000019ED8F13FB0>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x0000019ED8F0AB70>, 422921.14)]']
+connector: <aiohttp.connector.TCPConnector object at 0x0000019ED8F13F80>
+INFO:aiogram.event:Update id=27486354 is handled. Duration 172 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001EFD1211190>
+INFO:aiogram.event:Update id=27486355 is handled. Duration 108 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000210D030BE00>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000210D043B890>
+INFO:aiogram.event:Update id=27486356 is handled. Duration 172 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001977C5160C0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001977CC9ED20>
+INFO:root:New user
+INFO:aiogram.event:Update id=27486357 is handled. Duration 155 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002236A7E4830>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002236C8D8170>
+INFO:aiogram.event:Update id=27486358 is handled. Duration 172 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000013D79807FB0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000013D798235F0>
+INFO:aiogram.event:Update id=27486359 is handled. Duration 141 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000130910D7A10>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000130913D4E30>
+INFO:aiogram.event:Update id=27486360 is handled. Duration 233 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001F832483E90>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001F8324C3080>
+INFO:aiogram.event:Update id=27486361 is handled. Duration 93 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486362 is handled. Duration 108 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486363 is handled. Duration 155 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486364 is handled. Duration 141 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001B121187230>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001B1211D8110>

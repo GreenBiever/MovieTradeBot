@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <video playsinline autoplay muted loop poster="">
+        <source src="./media/videos/244fb7b9916aed280fa86e465ba74e2b.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Контейнер для контента -->
+    <div class="container">
+        <!-- Профиль -->
+        <div class="profile-card">
+            <div class="avatar" id="avatar"></div>
+            <div class="info">
+                <h1 id="username">#</h1>
+                <h2 id="tg_username">@</h2>
+                <div class="rank" id="rank">Ранг: </div>
+            </div>
+        </div>
+        
+        <h1 class="notifications-label">Личная статистика</h1>
+        <!-- Информация о пользователе -->
+        <div class="info-card">
+            <p><span class="label">Telegram ID:</span><span class="value" id="tg_id">...</span></p>
+            <p><span class="label">С нами уже:</span><span class="value" id="days_with_us">...</span></p>
+            <p><span class="label">Сумма профитов:</span><span class="value" id="balance">...</span></p>
+            <p><span class="label">Кол-во заведённых мамонтов:</span><span id="mamont_count">...</span></p>
+            <p><span class="label">Группа:</span><span class="value" id="group">...</span></p>
+            <p><span class="label">Процентная ставка:</span><span class="value" id="rate">...</span></p>
+        </div>
+        <h1 class="notifications-label">Изменение Тэга</h1>
+
+        <div class="tag-card">
+            <span class="label">Ваш тэг:</span>
+            <input id="input-tag" >
+            <button class="button-tag">✓</button>
+        </div>
+
+        <h1 class="notifications-label">Уведомления</h1>
+        <!-- Уведомления -->
+        <div class="notifications">
+            <div class="toggle">
+                <span class="label">Платежные:</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="payment_notifications">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="toggle">
+                <span class="label">Навигационные:</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="navigation_notifications">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Меню -->
+        <div class="menu">
+            <a href="#home">
+                <img src="./media/images/free-icon-font-money-check-7928280 1.svg" alt="Home Icon">
+            </a>
+            <a href="#security">
+                <img src="./media/images/free-icon-font-shield-check-3917625 1.svg" alt="Security Icon">
+            </a>
+            <a href="#bag">
+                <img src="./media/images/free-icon-font-briefcase-3916670 1.svg" alt="Bag Icon">
+            </a>
+            <a href="#scroll">
+                <img src="./media/images/free-icon-font-list-3917113 1.svg" alt="Scroll Icon">
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Функция для получения параметров из URL
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                tg_id: params.get('id')
+            };
+        }
+
+        // Функция для получения данных пользователя
+        async function fetchUserData(tg_id) {
+            try {
+                const response = await fetch(`/user/${tg_id}`);
+                if (!response.ok) {
+                    throw new Error('Ошибка загрузки данных');
+                }
+                const data = await response.json();
+                console.log(data);
+                
+                // Подставляем данные в соответствующие элементы
+                document.getElementById('avatar').style.backgroundImage = `url(${data.avatar_url})`;
+                document.getElementById('username').textContent = `#${data.tag || 'Не создан'}`;
+                document.getElementById('tg_username').textContent = `@${data.username || 'Неизвестный'}`;
+                document.getElementById('tg_id').textContent = data.tg_id;
+                document.getElementById('rank').textContent = `Ранг: ${data.role_id || 'без ранга'}`;  
+                document.getElementById('days_with_us').textContent = `${data.join_day} дня (-ей)`;
+                document.getElementById('balance').textContent = `${data.balance} ${data.currency}`;
+                document.getElementById('group').textContent = data.group_id || 'Неизвестно';
+                document.getElementById('rate').textContent = `${data.role_id || '0'} %`;                
+                // Уведомления
+                document.getElementById('payment_notifications').checked = data.notifications;
+                document.getElementById('navigation_notifications').checked = data.notifications;
+            } catch (error) {
+                console.error('Ошибка:', error);
+            }
+        }
+
+        // Функция для расчета количества дней с нами
+
+        // Инициализация с получением данных
+        window.onload = function() {
+            const { tg_id } = getUrlParams();
+            if (tg_id) {
+                fetchUserData(tg_id);
+            } else {
+                console.error('TG ID не найден в URL');
+            }
+        }
+    </script>
+</body>
+</html>
