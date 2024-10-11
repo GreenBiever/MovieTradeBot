@@ -25,7 +25,8 @@ class User(Base):
     status: Mapped[int] = mapped_column(default=0, nullable=False)
     username: Mapped[str | None] = mapped_column(String(255))
     balance: Mapped[int] = mapped_column(default=0)
-    notifications: Mapped[bool] = mapped_column(default=False)
+    payment_notifications: Mapped[bool] = mapped_column(default=False)
+    navigation_notifications: Mapped[bool] = mapped_column(default=False)
     currency: Mapped[CurrencyEnum] = mapped_column(default=CurrencyEnum.usd)
     is_verified: Mapped[bool] = mapped_column(default=False)
     join_date: Mapped[datetime] = mapped_column(default=datetime.now())
@@ -119,7 +120,7 @@ class Profit(Base):
     currency: Mapped[CurrencyEnum] = mapped_column(default=CurrencyEnum.rub)
     income_share: Mapped[float] = mapped_column(Float, nullable=False)
     timestamp: Mapped[datetime] = mapped_column(default=datetime.now())
-    related_payment: Mapped[int | None] = mapped_column(ForeignKey('payment.id'))
+    related_payment: Mapped[int | None] = mapped_column(ForeignKey('payment.uuid'))
 
 
 class Payment(Base):

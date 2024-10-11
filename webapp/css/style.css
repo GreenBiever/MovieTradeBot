@@ -37,7 +37,7 @@ video {
   overflow-y: auto; /* Внутренние отступы */
 }
 
-.profile-card, .info-card, .notifications, .menu, .tag-card {
+.profile-card, .info-card, .notifications, .menu {
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 15px;
   padding: 20px;
@@ -97,29 +97,47 @@ video {
   color: #fff;
 }
 
+.tag-card {
+  display: flex;
+  align-items: center; /* Вертикальное выравнивание */
+  flex-wrap: nowrap; /* Запрещаем перенос на новую строку */
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 20px;
+  width: 100%;
+  max-width: 700px;
+}
+
 .tag-card .label {
   font-weight: bold;
   margin-right: 5px;
+  white-space: nowrap; /* Чтобы текст метки не переносился */
 }
 
 .tag-card input {
+  flex-grow: 1; /* Инпут будет занимать доступное пространство */
+  min-width: 0; /* Позволяет инпуту сокращаться до минимума */
+  max-width: 100%; /* Инпут не будет шире контейнера */
   border: 2px solid;
   border-radius: 5px;
   border-color: #ffffff;
   background-color: rgba(255, 255, 255, 0.0);
   font-size: 18px;
   color: #fff;
+  margin-right: 10px; /* Отступ между инпутом и кнопкой */
 }
 
 .tag-card button {
+  flex-shrink: 0; /* Кнопка не будет уменьшаться слишком сильно */
   font-size: 18px;
   background-color: #A10000;
   color: #ffffff;
   border: none;
   padding: 5px 20px;
   border-radius: 5px;
-  margin-left: 15px;
+  white-space: nowrap; /* Чтобы текст внутри кнопки не переносился */
 }
+
 
 .notifications-label {
   text-align: left;

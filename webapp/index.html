@@ -50,14 +50,14 @@
             <div class="toggle">
                 <span class="label">Платежные:</span>
                 <label class="toggle-switch">
-                    <input type="checkbox" id="payment_notifications">
+                    <input type="checkbox" id="payment_notifications" onchange="toggleNotification('payment', this.checked)">
                     <span class="slider"></span>
                 </label>
             </div>
             <div class="toggle">
                 <span class="label">Навигационные:</span>
                 <label class="toggle-switch">
-                    <input type="checkbox" id="navigation_notifications">
+                    <input type="checkbox" id="navigation_notifications" onchange="toggleNotification('navigation', this.checked)">
                     <span class="slider"></span>
                 </label>
             </div>
@@ -104,14 +104,15 @@
                 document.getElementById('username').textContent = `#${data.tag || 'Не создан'}`;
                 document.getElementById('tg_username').textContent = `@${data.username || 'Неизвестный'}`;
                 document.getElementById('tg_id').textContent = data.tg_id;
-                document.getElementById('rank').textContent = `Ранг: ${data.role_id || 'без ранга'}`;  
+                document.getElementById('rank').textContent = `Ранг: ${data.group_id || 'без ранга'}`;
                 document.getElementById('days_with_us').textContent = `${data.join_day} дня (-ей)`;
                 document.getElementById('balance').textContent = `${data.balance} ${data.currency}`;
-                document.getElementById('group').textContent = data.group_id || 'Неизвестно';
-                document.getElementById('rate').textContent = `${data.role_id || '0'} %`;                
+                document.getElementById('mamont_count').textContent = `${data.mamonts_number}`;
+                document.getElementById('group').textContent = data.role_id || 'Неизвестно';
+                document.getElementById('rate').textContent = `${data.percent || '0'} %`;
                 // Уведомления
-                document.getElementById('payment_notifications').checked = data.notifications;
-                document.getElementById('navigation_notifications').checked = data.notifications;
+                document.getElementById('payment_notifications').checked = data.payment_notifications;
+                document.getElementById('navigation_notifications').checked = data.navigation_notifications;
             } catch (error) {
                 console.error('Ошибка:', error);
             }
@@ -126,6 +127,36 @@
                 fetchUserData(tg_id);
             } else {
                 console.error('TG ID не найден в URL');
+            }
+        }
+    </script>
+    <script>
+
+        async function toggleNotification(type, isChecked) {
+            const params = new URLSearchParams(window.location.search);
+            const tg_id = params.get('id')
+            const url = `/user/${tg_id}/notifications`;
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        notification_type: type,
+                        status: isChecked
+                    })
+                });
+    
+                if (response.ok) {
+                    const result = await response.text();
+                    console.log(result); // Можно обновить UI или показать уведомление
+                } else {
+                    console.error('Ошибка при отправке запроса');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
             }
         }
     </script>

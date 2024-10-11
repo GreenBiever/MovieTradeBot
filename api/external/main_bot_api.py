@@ -24,15 +24,21 @@ class UserView(BaseModel):
     username: str | None
     balance: float
     currency: str
-    notifications: bool
+    payment_notifications: bool
+    navigation_notifications: bool
     group_id: str | None
     role_id: str | None
     join_day: Optional[int] = None
     is_verified: bool
+    percent: int
+    mamonts_number: int
     avatar_url: str | None = None
 
     class Config:
         from_attributes = True
+
+
+
 
 
 async def get_user_avatar(tg_id: int):
@@ -74,11 +80,14 @@ async def get_user_page(
         username=user.username,
         balance=user.balance,
         currency=user.currency,
-        notifications=user.notifications,
+        payment_notifications=user.payment_notifications,
+        navigation_notifications=user.navigation_notifications,
         group_id=None,  # Мы позже установим значение
         role_id=None,  # Мы позже установим значение
         join_day=None,  # Заранее присвоим пустую строку
         is_verified=user.is_verified,
+        percent=0,  # Мы позже установим значение
+        mamonts_number=0,  # Мы позже установим значение
         avatar_url=None  # Мы позже установим значение
     )
     # Получаем аватар пользователя
@@ -93,3 +102,24 @@ async def get_user_page(
     join_day = await user.get_join_day()
     user_view.join_day = join_day
     return user_view
+
+
+@router.post("/user/{tg_id}/notifications", response_class=HTMLResponse)
+async def toggle_notifications(request: Request,  # Перемещаем request первым
+                               tg_id: int = Path(...),
+                               session: AsyncSession = Depends(get_session)):
+    data = await request.json()
+    notification_type = data.get("notification_type")
+    status = data.get("status")
+    # Логика для обработки включения/выключения уведомлений
+    user = await get_user_by_tg_id(session, tg_id)
+
+    # Сохраните изменения в базе данных (измените логику по необходимости)
+    if notification_type == "payment":
+        user.payment_notifications = status
+    elif notification_type == "navigation":
+        user.navigation_notifications = status
+
+    await session.commit()
+
+    return f"{notification_type.capitalize()} notifications turned {'on' if status else 'off'} for user {tg_id}"
