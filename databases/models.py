@@ -97,8 +97,8 @@ class UserCode(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
-    domain_config: Mapped[str] = mapped_column(Text, nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.tg_id'))
+    domain_config: Mapped[str] = mapped_column(Text, nullable=True)
 
 
 class ProfitType(Base):

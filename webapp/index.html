@@ -40,8 +40,8 @@
 
         <div class="tag-card">
             <span class="label">Ваш тэг:</span>
-            <input id="input-tag" >
-            <button class="button-tag">✓</button>
+            <input id="input-tag" type="text" placeholder="Новый тег">
+            <button class="button-tag" onclick="updateTag()">✓</button>
         </div>
 
         <h1 class="notifications-label">Уведомления</h1>
@@ -65,16 +65,16 @@
 
         <!-- Меню -->
         <div class="menu">
-            <a href="#home">
-                <img src="./media/images/free-icon-font-money-check-7928280 1.svg" alt="Home Icon">
+            <a id="home-link" href="index.html">
+                <img src="./media/images/free-icon-font-money-check-7928280 1.svg" alt="Promocode Icon">
             </a>
-            <a href="#security">
+            <a id="promocode-link" href="promocode.html">
                 <img src="./media/images/free-icon-font-shield-check-3917625 1.svg" alt="Security Icon">
             </a>
-            <a href="#bag">
+            <a id="bag-link" href="#bag">
                 <img src="./media/images/free-icon-font-briefcase-3916670 1.svg" alt="Bag Icon">
             </a>
-            <a href="#scroll">
+            <a id="scroll-link" href="#scroll">
                 <img src="./media/images/free-icon-font-list-3917113 1.svg" alt="Scroll Icon">
             </a>
         </div>
@@ -158,6 +158,52 @@
             } catch (error) {
                 console.error('Ошибка:', error);
             }
+        }
+    </script>
+    <script>
+        async function updateTag() {
+            const params = new URLSearchParams(window.location.search);
+            const tg_id = params.get('id') // Замените на актуальный tg_id, либо передавайте его динамически
+            const newTag = document.getElementById('input-tag').value;
+    
+            if (!newTag) {
+                alert("Введите новый тег");
+                return;
+            }
+    
+            try {
+                const response = await fetch(`/user/${tg_id}/tag`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        new_tag: newTag
+                    }),
+                });
+    
+                if (response.ok) {
+                    // Если обновление успешно, обновляем страницу
+                    window.location.reload();
+                } else {
+                    alert("Произошла ошибка при обновлении тега");
+                }
+            } catch (error) {
+                console.error("Ошибка:", error);
+                alert("Произошла ошибка при обновлении тега");
+            }
+        }
+    </script>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+
+        // Если id существует, обновляем ссылки
+        if (id) {
+            document.getElementById('home-link').href = `/?id=${id}`;
+            document.getElementById('promocode-link').href = `promocode.html/?id=${id}`;
+            document.getElementById('bag-link').href = `#bag/?id=${id}`;
+            document.getElementById('scroll-link').href = `#scroll/?id=${id}`;
         }
     </script>
 </body>

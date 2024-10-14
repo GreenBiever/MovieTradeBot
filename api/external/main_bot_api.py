@@ -5,9 +5,9 @@ from aiogram import Bot
 
 import config
 from databases.connect import get_session
-from databases.crud import get_user_by_tg_id
+from databases.crud import get_user_by_tg_id, get_promocodes_by_user
 from fastapi import APIRouter, Query, Request, Path, Depends, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from databases.models import User, UserGroup, UserRoles
@@ -38,11 +38,15 @@ class UserView(BaseModel):
         from_attributes = True
 
 
-
+class PromocodeView(BaseModel):
+    id: int
+    name: str
+    user_id: int
 
 
 async def get_user_avatar(tg_id: int):
     photos = await bot.get_user_profile_photos(tg_id, limit=1)
+    print(photos)
 
     if photos.total_count > 0:
         # Берем первую фотографию из результата
@@ -53,7 +57,11 @@ async def get_user_avatar(tg_id: int):
 
         # Формируем URL для скачивания
         avatar_url = f"https://api.telegram.org/file/bot{config.BOT_TOKEN}/{file_path}"
+        print(avatar_url)
         return avatar_url
+
+
+# api methods for index.html page
 
 
 @router.get("/", response_class=HTMLResponse)
@@ -95,10 +103,8 @@ async def get_user_page(
     user_view.avatar_url = avatar_url
     group = await user.get_group(session)
     user_view.group_id = group.name if group else None
-    print(group.name)
     role = await user.get_role(session)
     user_view.role_id = role.name if role else None
-    print(role.name)
     join_day = await user.get_join_day()
     user_view.join_day = join_day
     return user_view
@@ -123,3 +129,44 @@ async def toggle_notifications(request: Request,  # Перемещаем request
     await session.commit()
 
     return f"{notification_type.capitalize()} notifications turned {'on' if status else 'off'} for user {tg_id}"
+
+
+@router.post("/user/{tg_id}/tag", response_class=HTMLResponse)
+async def update_tag(request: Request,
+                     tg_id: int = Path(...),
+                     session: AsyncSession = Depends(get_session)):
+    data = await request.json()
+    new_tag = data.get("new_tag")
+    user = await get_user_by_tg_id(session, tg_id)
+    user.tag = new_tag
+    await session.commit()
+    return f"Tag updated to {new_tag} for user {tg_id}"
+
+
+# api methods for promocode.html page
+
+@router.get("/promocode.html/", response_class=HTMLResponse)
+async def get_promocode_page(request: Request, id: str = Query()):
+    if not id:
+        raise HTTPException(status_code=400, detail="ID не передан")
+    return templates.TemplateResponse(
+        name="promocode.html", context={"request": request, "id": id}
+    )
+
+
+@router.get("/promocode/{tg_id}", response_class=JSONResponse)
+async def get_promocodes(request: Request, tg_id: int = Path(...), session: AsyncSession = Depends(get_session)):
+    promocodes = await get_promocodes_by_user(session, tg_id)
+    print(promocodes)
+
+    # Формируем список промокодов
+    promocode_list = []
+    if promocodes:
+        for promocode in promocodes:
+            promocode_list.append({
+                'id': promocode.id,
+                'name': promocode.name,
+            })
+
+    # Возвращаем в формате JSON
+    return {'promocodes': promocode_list}

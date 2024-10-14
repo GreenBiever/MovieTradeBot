@@ -3,7 +3,7 @@ from typing import List, Sequence
 from sqlalchemy import select, update
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
-from databases.models import User
+from databases.models import User, UserCode
 from databases.enums import CurrencyEnum
 from aiogram import Bot
 from keyboards import keyboard
@@ -21,3 +21,8 @@ async def register_referal(session: AsyncSession, referer: User, user: User, bot
             referer.tg_id,
             f'Ваш реферал {user.tg_id} привязан к вашей учетной записи. '
         )
+
+
+async def get_promocodes_by_user(session: AsyncSession, tg_id: int) -> Sequence:
+    result = await session.execute(select(UserCode).where(UserCode.user_id == tg_id))
+    return result.scalars().all()

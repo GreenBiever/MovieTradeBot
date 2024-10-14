@@ -232,3 +232,70 @@ input:checked + .slider:before {
   height: auto;
   padding: 10px; /* Внутренний отступ для иконок */
 }
+
+/* ДИЗАЙН ДЛЯ PROMOCODE.HTML */
+
+.promo-create {
+  background: linear-gradient(to right, #2D2D2D, #A10000);
+  display: flex;
+  align-items: center;
+  border-radius: 15px;
+  padding: 20px;
+  width: 100%;
+  max-width: 700px;
+}
+
+.promo-create .label {
+  font-weight: bold;
+  margin-right: 5px;
+  white-space: nowrap; /* Чтобы текст метки не переносился */
+}
+
+.promo-create input {
+  flex-grow: 1; /* Инпут будет занимать доступное пространство */
+  min-width: 0; /* Позволяет инпуту сокращаться до минимума */
+  max-width: 100%; /* Инпут не будет шире контейнера */
+  border: 2px solid;
+  border-radius: 5px;
+  border-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.0);
+  font-size: 18px;
+  color: #fff;
+  margin-right: 10px; /* Отступ между инпутом и кнопкой */
+}
+
+.promo-create button {
+  flex-shrink: 0; /* Кнопка не будет уменьшаться слишком сильно */
+  font-size: 18px;
+  background-color: #2D2D2D;
+  color: #ffffff;
+  border: none;
+  padding: 5px 20px;
+  border-radius: 5px;
+  white-space: nowrap; /* Чтобы текст внутри кнопки не переносился */
+}
+
+.promo-control {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 20px;
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  flex-direction: column; /* Размещаем кнопки вертикально */
+  align-items: center; /* Центрируем кнопки по горизонтали */
+}
+
+.promo-button {
+  font-size: 18px;
+  background-color: #A10000;
+  color: #ffffff;
+  border: none;
+  padding: 10px; /* Добавляем отступ внутри кнопки */
+  border-radius: 5px;
+  width: calc(100% - 20px); /* Кнопка будет растягиваться на всю ширину с учетом отступов */
+  margin-bottom: 5px;
+  margin-top: 5px; /* Отступ между кнопками */
+  text-align: center; /* Центрируем текст внутри кнопки */
+  box-sizing: border-box; /* Учитываем padding и border в общей ширине */
+}
