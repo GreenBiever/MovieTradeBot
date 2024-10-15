@@ -5,13 +5,15 @@ from aiogram import Bot
 
 import config
 from databases.connect import get_session
-from databases.crud import get_user_by_tg_id, get_promocodes_by_user
+from databases.crud import get_user_by_tg_id, get_promocodes_by_user, get_promocode_by_id, get_websites, get_promocode_types
 from fastapi import APIRouter, Query, Request, Path, Depends, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
-from databases.models import User, UserGroup, UserRoles
+from sqlalchemy import insert
+from databases.models import User, UserGroup, UserRoles, UserCode, Hosting_Website, UserCodeType
 from pydantic import BaseModel
+
 
 bot: Bot = Bot(config.BOT_TOKEN)
 router = APIRouter()
@@ -39,9 +41,9 @@ class UserView(BaseModel):
 
 
 class PromocodeView(BaseModel):
-    id: int
     name: str
     user_id: int
+    type_id: int
 
 
 async def get_user_avatar(tg_id: int):
@@ -154,10 +156,9 @@ async def get_promocode_page(request: Request, id: str = Query()):
     )
 
 
-@router.get("/promocode/{tg_id}", response_class=JSONResponse)
+@router.get("/promocodes/{tg_id}", response_class=JSONResponse)
 async def get_promocodes(request: Request, tg_id: int = Path(...), session: AsyncSession = Depends(get_session)):
     promocodes = await get_promocodes_by_user(session, tg_id)
-    print(promocodes)
 
     # Формируем список промокодов
     promocode_list = []
@@ -170,3 +171,36 @@ async def get_promocodes(request: Request, tg_id: int = Path(...), session: Asyn
 
     # Возвращаем в формате JSON
     return {'promocodes': promocode_list}
+
+
+@router.get("/websiteList", response_class=JSONResponse)
+async def get_all_websites(session: AsyncSession = Depends(get_session)):
+    websites = await get_websites(session)
+    website_list = [{'id': website.id, 'name': website.name} for website in websites]
+    return {'websites': website_list}
+
+
+@router.get("/promocodeTypes", response_class=JSONResponse)
+async def fetch_promocode_types(session: AsyncSession = Depends(get_session)):
+    promocode_types = await get_promocode_types(session)
+    promocodes_list = [{'id': type.id, 'name': type.name} for type in promocode_types]
+    return {'promocode_types': promocodes_list}
+
+
+@router.get("/promocode/{code_id}", response_class=JSONResponse)
+async def get_promocode(request: Request, code_id: int = Path(...), session: AsyncSession = Depends(get_session)):
+    promocode = await get_promocode_by_id(session, code_id)
+
+
+@router.post("/promocodeCreate/{user_id}", response_class=JSONResponse)
+async def create_promocode(request: Request, user_id: int = Path(...), session: AsyncSession = Depends(get_session)):
+    data = await request.json()
+    name = data.get("name")
+    type_id = data.get("type_id")
+    await session.execute(insert(UserCode).values(
+        name=name,
+        user_id=user_id,
+        type_id=type_id
+    ))
+    await session.commit()
+    return {"message": "Promocode created successfully"}

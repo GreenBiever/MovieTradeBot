@@ -97,8 +97,16 @@ class UserCode(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    type_id: Mapped[str] = mapped_column(ForeignKey('usercodetype.id'))
     user_id: Mapped[int] = mapped_column(ForeignKey('users.tg_id'))
     domain_config: Mapped[str] = mapped_column(Text, nullable=True)
+
+
+class UserCodeType(Base):
+    __tablename__ = "usercodetype"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name:  Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
 
 
 class ProfitType(Base):
@@ -135,4 +143,22 @@ class Payment(Base):
     service: Mapped[str] = mapped_column(String(255), nullable=False)
     worker: Mapped[int] = mapped_column(ForeignKey('users.id'))
     status: Mapped[bool] = mapped_column(default=False)
-    
+
+
+class Domains(Base):
+    __tablename__ = 'domains'
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    domain: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    created_at: Mapped[datetime] = mapped_column(default=datetime.now())
+    ssl_certificate:  Mapped[str] = mapped_column(Text, nullable=True)
+
+
+class Hosting_Website(Base):
+    __tablename__ = 'hosting_website'
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    config_key: Mapped[str] = mapped_column(String(255), nullable=True, unique=True)
+    config_schema: Mapped[str] = mapped_column(Text, nullable=True)
+    main_domain_id: Mapped[int] = mapped_column(ForeignKey('domains.id'))

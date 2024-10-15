@@ -238,6 +238,7 @@ input:checked + .slider:before {
 .promo-create {
   background: linear-gradient(to right, #2D2D2D, #A10000);
   display: flex;
+  flex-direction: column; /* Элементы располагаются по вертикали */
   align-items: center;
   border-radius: 15px;
   padding: 20px;
@@ -247,33 +248,62 @@ input:checked + .slider:before {
 
 .promo-create .label {
   font-weight: bold;
-  margin-right: 5px;
-  white-space: nowrap; /* Чтобы текст метки не переносился */
+  margin-bottom: 10px; /* Отступ между меткой и контейнером */
+  white-space: nowrap;
 }
 
-.promo-create input {
-  flex-grow: 1; /* Инпут будет занимать доступное пространство */
-  min-width: 0; /* Позволяет инпуту сокращаться до минимума */
-  max-width: 100%; /* Инпут не будет шире контейнера */
+.input-container {
+  display: flex;
+  align-items: center; /* Выравниваем по вертикали */
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.input-container input {
+  flex-grow: 1; /* Инпут растягивается на доступное пространство */
   border: 2px solid;
   border-radius: 5px;
   border-color: #ffffff;
   background-color: rgba(255, 255, 255, 0.0);
   font-size: 18px;
   color: #fff;
-  margin-right: 10px; /* Отступ между инпутом и кнопкой */
+  margin-right: 10px; /* Отступ между инпутом и datalist */
+}
+
+.input-container select {
+  background-color: #2D2D2D;
+  color: white;
+  border: 2px solid white;
+  border-radius: 5px;
+  margin-top: 10px;
+  padding: 10px;
+  font-size: 18px;
+  width: 150px;
 }
 
 .promo-create button {
-  flex-shrink: 0; /* Кнопка не будет уменьшаться слишком сильно */
+  margin-top: 10px;
   font-size: 18px;
   background-color: #2D2D2D;
   color: #ffffff;
   border: none;
-  padding: 5px 20px;
+  padding: 10px 20px;
   border-radius: 5px;
-  white-space: nowrap; /* Чтобы текст внутри кнопки не переносился */
+  white-space: nowrap;
+  align-self: center; /* Центрируем кнопку */
 }
+
+.promo-create input:focus {
+  outline: none; /* Убираем стандартную обводку при фокусе */
+}
+
+
+.promo-button-container {
+  width: 100%;
+  max-width: 700px;
+}
+
 
 .promo-control {
   background-color: rgba(255, 255, 255, 0.1);
@@ -291,11 +321,56 @@ input:checked + .slider:before {
   background-color: #A10000;
   color: #ffffff;
   border: none;
-  padding: 10px; /* Добавляем отступ внутри кнопки */
+  padding: 10px;
   border-radius: 5px;
-  width: calc(100% - 20px); /* Кнопка будет растягиваться на всю ширину с учетом отступов */
-  margin-bottom: 5px;
-  margin-top: 5px; /* Отступ между кнопками */
-  text-align: center; /* Центрируем текст внутри кнопки */
+  width: 100%; /* Кнопка растягивается на всю ширину контейнера */
+  margin-bottom: 10px;
+  margin-top: 10px; /* Увеличиваем отступ между кнопками */
+  text-align: center;
   box-sizing: border-box; /* Учитываем padding и border в общей ширине */
+  max-width: 700px; /* Ограничение по ширине, чтобы не превышать размеры контейнера */
+}
+
+.promo-menu {
+  color: white;
+  border-radius: 5px;
+  display: none; /* По умолчанию скрыто */
+  width: 100%; /* Меню растягивается на всю ширину контейнера */
+  max-width: 700px;
+  text-align: center;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out; /* Переход для высоты и внутреннего отступа */
+  padding: 0; /* Убираем отступы по умолчанию */
+}
+
+.promo-menu-open {
+  color: white;
+  border-radius: 5px;
+  display: block;
+  width: 100%; /* Меню растягивается на всю ширину контейнера */
+  max-width: 700px;
+  text-align: center;
+  max-height: 300px; /* Максимальная высота, когда меню раскрыто */
+  overflow: hidden;
+  padding: 10px 20px; /* Добавляем отступы, когда меню открыто */
+  transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+}
+
+.promo-menu button {
+  margin: 5px 0;
+  padding: 5px;
+  background-color: #2D2D2D;
+  color: white;
+  width: 100%; /* Кнопки внутри меню растягиваются на всю ширину */
+  cursor: pointer;
+  border: 2px solid white;
+  border-radius: 5px;
+  font-size: 18px;  
+  font-weight: bold;
+}
+
+.promo-button-container {
+  width: 100%; /* Контейнер растягивается на всю ширину */
+  max-width: 700px; /* Ограничиваем максимальную ширину */
 }
