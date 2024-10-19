@@ -3,7 +3,7 @@ from typing import List, Sequence
 from sqlalchemy import select, update
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
-from databases.models import User, UserCode, Hosting_Website, UserCodeType
+from databases.models import User, UserCode, Hosting_Website, UserCodeType, Domains
 from databases.enums import CurrencyEnum
 from aiogram import Bot
 from keyboards import keyboard
@@ -41,3 +41,10 @@ async def get_websites(session: AsyncSession) -> Sequence:
 async def get_promocode_types(session: AsyncSession) -> Sequence:
     result = await session.execute(select(UserCodeType))
     return result.scalars().all()
+
+
+async def get_hosting_website(session, website_type) -> Sequence:
+    result = await session.execute(select(Hosting_Website).where(Hosting_Website.id == website_type))
+    host_website = result.scalars().first()
+    domain = await session.execute(select(Domains.domain).where(Domains.id == host_website.main_domain_id))
+    return domain.scalars().first()

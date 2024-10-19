@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <video playsinline autoplay muted loop poster="">
+        <source src="/media/videos/244fb7b9916aed280fa86e465ba74e2b.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Контейнер для контента -->
+    <div class="container">
+        <div class="base-promocode">
+            <p><span class="label">Название: </span><span class="value" id="promocode_name">...</span></p>
+            <p><span class="label">Тип промокода: </span><span class="value" id="promocode_type">...</span></p>
+            <p><span class="label">Воркер: </span><span class="value" id="user_id">...</span></p>
+        </div>
+        <!-- Управление промокодами -->
+        <h1 class="notifications-label">Управление промокодом</h1>
+        <div class='promo-edit' id="promo-settings">
+            <!-- Настройки будут подгружаться сюда -->
+        </div>
+
+
+
+        <!-- Меню -->
+        <div class="menu">
+            <a id="home-link" href="index.html">
+                <img src="/media/images/free-icon-font-money-check-7928280 1.svg" alt="Promocode Icon">
+            </a>
+            <a id="promocode-link" href="">
+                <img src="/media/images/free-icon-font-shield-check-3917625 1.svg" alt="Security Icon">
+            </a>
+            <a id="bag-link" href="#bag">
+                <img src="/media/images/free-icon-font-briefcase-3916670 1.svg" alt="Bag Icon">
+            </a>
+            <a id="scroll-link" href="#scroll">
+                <img src="/media/images/free-icon-font-list-3917113 1.svg" alt="Scroll Icon">
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const params1 = new URLSearchParams(window.location.search);
+        const id = params1.get('id');
+
+        // Если id существует, обновляем ссылки
+        if (id) {
+            document.getElementById('home-link').href = `/?id=${id}`;
+            document.getElementById('promocode-link').href = `promocode.html/?id=${id}`;
+            document.getElementById('bag-link').href = `#bag/?id=${id}`;
+            document.getElementById('scroll-link').href = `#scroll/?id=${id}`;
+        }
+    </script>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const promocodeId = params.get('promocodeId');
+        
+
+        // Функция для загрузки промокодов
+        async function loadPromocode() {
+            const params1 = new URLSearchParams(window.location.search);
+            const user_id = params1.get('id');
+            try {
+                if (promocodeId) {
+                    // Запрос к вашему API для получения данных о промокоде
+                    const response = await fetch(`/promocode/${promocodeId}`);
+                    
+                    // Проверка на успешность ответа
+                    if (!response.ok) {
+                        throw new Error(`Ошибка HTTP: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    const type = data.type;
+                    let typeText;
+                    if (type === 1) {
+                        typeText = 'Антикино';
+                        loadAntiKinoSettings();
+                    }
+                    if (type === 2) {
+                        typeText = 'Театр';
+                        loadAntiTheatreSettings();
+                    } 
+                    if (type === 3) {
+                        typeText = 'Выставки';
+                        loadAntiKinoSettings();
+                    } if  (type === 4) {
+                        typeText = 'Трейд';
+                        loadTradeSettings();
+                    } if (type === 5) {
+                        typeText = 'BlaBlaCar';
+                        loadBlaBlaCarSettings();
+                    }
+                    // Обновление содержимого HTML элементов с данными промокода
+                    document.getElementById('promocode_name').textContent = data.name || 'Неизвестно';
+                    document.getElementById('promocode_type').textContent = typeText || 'Неизвестно';
+                    document.getElementById('user_id').textContent = user_id || 'Неизвестно'
+                } else {
+                    console.error('Промокод ID не найден в параметрах URL');
+                }
+            } catch (error) {
+                console.error('Ошибка при получении промокода:', error);
+            }
+        }
+
+        loadPromocode();
+
+        function loadAntiKinoSettings() {
+            const container = document.getElementById('promo-settings');
+            container.innerHTML = `
+                <h2>Настройки Кинотеатр</h2>
+                <label>Страна промокода</label>
+                <select id="country">
+                    <option value="UE">Украина UE</option>
+                    <option value="KZ">Казахстан KZ</option>
+                    <option value="AZ">Азербайджан AZ</option>
+                    <option value="EU">Европа EU</option>
+                </select>
+                <label>Язык сайта</label>
+                <select id="language">
+                    <option value="RU">Россия RU</option>
+                    <option value="UE">Украина UE</option>
+                    <option value="KZ">Казахстан KZ</option>
+                    <option value="AZ">Азербайджан AZ</option>
+                    <option value="PL">Польский PL</option>
+                    <option value="EN">Английский EN</option>
+                </select>
+                <label>Валюта</label>
+                <select id="currency">
+                    <option value="RUB">RUB</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="UAH">UAH</option>
+                    <option value="KZT">KZT</option>
+                    <option value="AZN">AZN</option>
+                    <option value="PLN">PLN</option>
+                </select>
+                <button class="save-button" id="saveSettingsAntikino">Сохранить изменения</button>
+                <button>Изменить предпросмотр</button>
+                <div class="modal-block">
+                    <button class="open-modal" data-modal="address">Изменить адрес и цену</button>
+                    <div class="modal modal-address">
+                        <div class="modal-content">
+                            <span class="close">X</span>
+                            <label for="room-select">Выберите комнату:</label>
+                            <select id="room-select">
+                                <option value="0">Комната 1</option>
+                                <option value="1">Комната 2</option>
+                                <option value="2">Комната 3</option>
+                                <option value="3">Комната 4</option>
+                                <option value="4">Комната 5</option>
+                            </select>
+                            <input type="text" id="new-address" placeholder="Введите новый адрес">
+                            <input type="number" id="new-price" placeholder="Введите новую цену">
+                            <button class="save" data-modal="address">Сохранить</button>
+                        </div>
+                    </div>
+                </div>
+                <button id="open-modal-delete">Удалить промокод</button>
+            `;
+
+            // Сохранение настроек
+            document.getElementById('saveSettingsAntikino').addEventListener('click', async () => {
+                const country = document.getElementById('country').value;
+                const language = document.getElementById('language').value;
+                const currency = document.getElementById('currency').value;
+                const params1 = new URLSearchParams(window.location.search);
+                const promocodeId = params1.get('promocodeId');
+
+                const settingsData = {
+                    country: country,
+                    language: language,
+                    currency: currency
+                };
+
+                try {
+                    const response = await fetch(`/promocodeUpdateAntikino/${promocodeId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(settingsData)
+                    });
+
+                    const result = await response.json();
+                    if (response.ok) {
+                        alert("Настройки успешно обновлены");
+                    } else {
+                        alert("Ошибка: " + result.message);
+                    }
+                } catch (error) {
+                    alert("Ошибка сети: " + error.message);
+                }
+            });
+
+            // Обработчики событий для модальных окон
+            document.querySelectorAll('.open-modal').forEach(button => {
+                button.addEventListener('click', function () {
+                    const modalType = this.getAttribute('data-modal');
+                    document.querySelector(`.modal-${modalType}`).style.display = 'block';
+                });
+            });
+
+            // Закрытие модального окна
+            document.querySelectorAll('.close').forEach(button => {
+                button.addEventListener('click', function () {
+                    this.closest('.modal').style.display = 'none';
+                });
+            });
+
+            // Закрытие модального окна при клике вне его области
+            window.addEventListener('click', function (event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.style.display = 'none';
+                }
+            });
+
+            // Сохранение данных и закрытие окна
+            document.querySelector('.save[data-modal="address"]').addEventListener('click', async function () {
+                const selectedRoomIndex = document.getElementById('room-select').value;
+                const newAddress = document.getElementById('new-address').value;
+                const newPrice = document.getElementById('new-price').value;
+
+                // Извлечение promocodeId из URL
+                const params = new URLSearchParams(window.location.search);
+                const promocodeId = params.get('promocodeId');
+
+                // Подготовка данных для отправки
+                const payload = {
+                    roomIndex: selectedRoomIndex,
+                    address: newAddress,
+                    price: newPrice
+                };
+
+                try {
+                    // Отправка данных на сервер
+                    const response = await fetch(`/promocodeUpdateAntikinoRoom/${promocodeId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Ошибка при сохранении данных');
+                    }
+
+                    const result = await response.json();
+                    console.log('Данные успешно сохранены:', result);
+                    alert('Данные успешно сохранены!');
+
+                    // Закрытие модального окна
+                    document.querySelector(`.modal-address`).style.display = 'none';
+
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    alert('Ошибка при сохранении данных: ' + error.message);
+                }
+            });
+        }
+
+
+        function loadAntiTheatreSettings() {
+            const container = document.getElementById('promo-settings');
+            container.innerHTML = `
+                <h2>Настройки Театра</h2>
+                <label>Страна промокода</label>
+                <select>
+                    <option value="UE">Украина UE</option>
+                    <option value="KZ">Казахстан KZ</option>
+                    <option value="AZ">Азербайджан AZ</option>
+                    <option value="EU">Европа EU</option>
+                </select>
+                <label>Язык сайта</label>
+                <select>
+                    <option value="RU">Россия RU</option>
+                    <option value="UE">Украина UE </option>
+                    <option value="KZ">Казахстан KZ</option>
+                    <option value="AZ">Азербайджан AZ</option>
+                    <option value="PL">Польский PL</option>
+                    <option value="EN">Английский EN</option>
+                </select>
+                <button>Изменить валюту</button>
+                <button>Изменить предпросмотр</button>
+                <button>Изменить адрес</button>
+                <button>Изменить цены</button>
+                <button>Изменить посадочные места</button>
+                <button>Изменить время</button>
+                <button>Удалить промокод</button>
+            `;
+        }
+
+        // Функция для загрузки настроек Трейд
+        function loadTradeSettings() {
+            const container = document.getElementById('promo-settings');
+            container.innerHTML = `
+                <h2>Настройки Трейд</h2>
+                <label>Валюты</label>
+                <select>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="RUB">RUB</option>
+                    <option value="UAH">UAH</option>
+                    <option value="AED">AED</option>
+                    <option value="AZN">AZN</option>
+                    <option value="KZN">KZN</option>
+                </select>
+                <button>Управление мамонтами</button>
+                <h3>Настройки</h3>
+                <label>Ввод суммы вывода: </label>
+                <input type="checkbox">
+                <label>Процент удачи</label>
+                <input type="number" min="0" max="100" value="50">
+                <label>Минимальный вывод</label>
+                <input type="text" placeholder="Введите сумму">
+            `;
+        }
+
+        // Функция для загрузки настроек BlaBlaCar
+        function loadBlaBlaCarSettings() {
+            const container = document.getElementById('promo-settings');
+            container.innerHTML = `
+                <h2>Настройки BlaBlaCar</h2>
+                <p>Здесь будут настройки, специфичные для BlaBlaCar промокода</p>
+            `;
+        }
+
+        
+    </script>
+
+</body>
+</html>

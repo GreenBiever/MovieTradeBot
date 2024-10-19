@@ -2,18 +2,18 @@ from datetime import datetime
 from typing import Optional
 
 from aiogram import Bot
-
+import json
 import config
 from databases.connect import get_session
-from databases.crud import get_user_by_tg_id, get_promocodes_by_user, get_promocode_by_id, get_websites, get_promocode_types
+from databases.crud import get_user_by_tg_id, get_promocodes_by_user, get_promocode_by_id, get_websites, \
+    get_promocode_types, get_hosting_website
 from fastapi import APIRouter, Query, Request, Path, Depends, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import insert
+from sqlalchemy import insert, select, update
 from databases.models import User, UserGroup, UserRoles, UserCode, Hosting_Website, UserCodeType
 from pydantic import BaseModel
-
 
 bot: Bot = Bot(config.BOT_TOKEN)
 router = APIRouter()
@@ -190,6 +190,10 @@ async def fetch_promocode_types(session: AsyncSession = Depends(get_session)):
 @router.get("/promocode/{code_id}", response_class=JSONResponse)
 async def get_promocode(request: Request, code_id: int = Path(...), session: AsyncSession = Depends(get_session)):
     promocode = await get_promocode_by_id(session, code_id)
+    id = promocode.id
+    name = promocode.name
+    type = promocode.type_id
+    return {'id': id, 'name': name, 'type': type}
 
 
 @router.post("/promocodeCreate/{user_id}", response_class=JSONResponse)
@@ -197,10 +201,174 @@ async def create_promocode(request: Request, user_id: int = Path(...), session: 
     data = await request.json()
     name = data.get("name")
     type_id = data.get("type_id")
+    domain = await get_hosting_website(session, type_id)
+    settings = {}
+    if type_id == "1":
+        settings = {
+            "country": "EU",
+            "language": "EN",
+            "currency": "UAH",
+            "preview": {
+                "pictures": {
+                    "picture1": "",
+                    "picture2": "",
+                    "picture3": "",
+                    "picture4": "",
+                    "picture5": ""
+                }
+            },
+            "rooms": [
+                {"address": "Адрес комнаты 1", "price": 150},
+                {"address": "Адрес комнаты 2", "price": 200},
+                {"address": "Адрес комнаты 3", "price": 250},
+                {"address": "Адрес комнаты 4", "price": 300},
+                {"address": "Адрес комнаты 5", "price": 350}
+            ],
+            "time": f"{datetime.now().isoformat()}"
+        }
+    # Добавить логику для других типов промокодов
+    elif type_id == "4":
+        settings = {
+            "currency": "USD",
+            "language": "Английский",
+            "max_withdrawal": 1000,
+            "success_rate": 95,
+            "worker_settings": {
+                "mamont_management": True,
+                "min_withdrawal": 100
+            }
+        }
+    elif type_id == "5":
+        settings = {
+            "country": "Россия",
+            "language": "Русский",
+            "currency": "RUB",
+            "seating": {
+                "capacity": 80
+            },
+            "time": f"{datetime.now().isoformat()}"
+        }
+
+    settings_json = json.dumps(settings)  # Сериализуем настройки в JSON
+
+    # Сохранение промокода в базу данных
     await session.execute(insert(UserCode).values(
         name=name,
         user_id=user_id,
-        type_id=type_id
+        type_id=type_id,
+        domain_config=settings_json  # Сохраняем сериализованный JSON
     ))
     await session.commit()
     return {"message": "Promocode created successfully"}
+
+
+@router.get("/promocodeDelete/{code_id}", response_class=JSONResponse)
+async def delete_promocode(request: Request, code_id: int = Path(...), session: AsyncSession = Depends(get_session)):
+    promocode = await get_promocode_by_id(session, code_id)
+    await session.delete(promocode)
+    await session.commit()
+    return {"message": "Promocode deleted successfully"}
+
+
+# api methods for edit_promocode.html page
+@router.get("/edit_promo/", response_class=HTMLResponse)
+async def get_promocode_page(
+        request: Request,
+        id: str = Query(None, description="User ID"),
+        promocodeId: str = Query(None, description="Promocode ID")
+):
+    if not id or not promocodeId:
+        raise HTTPException(status_code=400, detail="ID or PromocodeID not provided")
+
+    return templates.TemplateResponse(
+        name="edit_promo.html",
+        context={"request": request, "id": id, "promocodeId": promocodeId}
+    )
+
+
+@router.post("/promocodeUpdateAntikino/{code_id}", response_class=JSONResponse)
+async def update_antikino_promocode(request: Request, code_id: int = Path(...),
+                                    session: AsyncSession = Depends(get_session)):
+    data = await request.json()
+
+    # Извлекаем новые параметры
+    country = data.get("country")
+    language = data.get("language")
+    currency = data.get("currency")
+
+    # Получаем текущий промокод по user_id
+    result = await session.execute(select(UserCode).where(UserCode.id == code_id))
+    user_code = result.scalars().first()
+
+    if not user_code:
+        return JSONResponse(status_code=404, content={"message": "Promocode not found"})
+
+    # Обновляем настройки промокода
+    settings = json.loads(user_code.domain_config)
+    settings.update({
+        "country": country,
+        "language": language,
+        "currency": currency
+    })
+    user_code.domain_config = json.dumps(settings)
+
+    # Сохраняем изменения в базе данных
+    session.add(user_code)
+    await session.commit()
+
+    return {"message": "Promocode updated successfully"}
+
+
+@router.post("/promocodeUpdateAntikinoRoom/{promocode_id}", response_class=JSONResponse)
+async def update_promocode(request: Request, promocode_id: int, session: AsyncSession = Depends(get_session)):
+    data = await request.json()
+    room_index = int(data.get("roomIndex"))
+    new_address = data.get("address")
+    new_price = data.get("price")
+
+    print('Полученные данные: \n'
+          f'Комната: {room_index}\n'
+          f'Адрес: {new_address}\n'
+          f'Цена: {new_price}')
+
+    # Используем запрос для получения промокода по ID
+    result = await session.execute(select(UserCode).where(UserCode.id == promocode_id))
+    promocode = result.scalars().first()
+
+    if promocode is None:
+        raise HTTPException(status_code=404, detail="Промокод не найден")
+
+    # Если domain_config хранится как строка, нужно его десериализовать
+    try:
+        config1 = json.loads(promocode.domain_config)  # Преобразование JSON-строки в словарь
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Неверный формат domain_config")
+
+    print(config1)
+
+    # Проверяем, что это словарь и содержит ключ 'rooms'
+    if not isinstance(config1, dict) or 'rooms' not in config1:
+        raise HTTPException(status_code=400, detail="Неверная конфигурация промокода")
+
+    rooms = config1['rooms']
+
+    # Проверка индекса комнаты
+    if room_index < 0 or room_index >= len(rooms):
+        raise HTTPException(status_code=400, detail="Неверный индекс комнаты")
+
+    # Обновляем адрес и цену
+    rooms[room_index]['address'] = new_address
+    rooms[room_index]['price'] = new_price
+
+    # Сохранение обновленного domain_config в базе данных
+    promocode.domain_config = json.dumps(config1)  # Сериализуем обратно в строку
+
+    # Выполняем обновление записи в базе данных
+    await session.execute(
+        update(UserCode)
+        .where(UserCode.id == promocode_id)
+        .values(domain_config=promocode.domain_config)
+    )
+    await session.commit()
+
+    return {"message": "Данные успешно обновлены"}

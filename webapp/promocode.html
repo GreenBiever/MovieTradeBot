@@ -98,8 +98,7 @@
                             promoMenu.classList.add('promo-menu');
                             promoMenu.setAttribute('id', `promo-menu-${promocode.id}`); // Уникальный ID для каждого меню
 
-                            // Функция загрузки списка сайтов
-                            loadWebsites(promoMenu);
+                            // Функция загрузки списка сайто
 
                             // Добавляем кнопки "Изменить" и "Удалить"
                             const editButton = document.createElement('button');
@@ -126,6 +125,7 @@
                 console.error('Ошибка при загрузке промокодов:', error);
             }
         }
+
 
 
         function toggleMenu(promocodeId) {
@@ -164,12 +164,22 @@
 
         // Функции для изменения и удаления промокода
         function editPromocode(promocodeId) {
-            console.log(`Изменение промокода с ID ${promocodeId}`);
+            const params1 = new URLSearchParams(window.location.search);
+            const userId = params1.get('id');
+            const url = `/edit_promo/?id=${userId}&promocodeId=${promocodeId}`;
+            window.location.href = url;
         }
 
-        function deletePromocode(promocodeId) {
-            console.log(`Удаление промокода с ID ${promocodeId}`);
+        async function deletePromocode(promocode_id) {
+            try {
+                const response = await fetch(`/promocodeDelete/${promocode_id}`);
+                const data = await response.json();
+                window.location.reload();
+            } catch (error) {
+                console.error('Ошибка при удалении промокода', error);
+            }
         }
+
 
         async function fetchPromocodeTypes() {
             try {
