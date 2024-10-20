@@ -53,7 +53,7 @@
         // Если id существует, обновляем ссылки
         if (id) {
             document.getElementById('home-link').href = `/?id=${id}`;
-            document.getElementById('promocode-link').href = `promocode.html/?id=${id}`;
+            document.getElementById('promocode-link').href = `../promocode.html/?id=${id}`;
             document.getElementById('bag-link').href = `#bag/?id=${id}`;
             document.getElementById('scroll-link').href = `#scroll/?id=${id}`;
         }
@@ -112,8 +112,34 @@
 
         loadPromocode();
 
-        function loadAntiKinoSettings() {
+        async function loadAntiKinoSettings() {
             const container = document.getElementById('promo-settings');
+            const params = new URLSearchParams(window.location.search);
+            const promocodeId = params.get('promocodeId');
+
+            // Загружаем текущие настройки промокода с сервера
+            let config;
+            try {
+                const response = await fetch(`/promocode/${promocodeId}`);
+                const promocodeData = await response.json();
+                console.log('Полученные данные промокода:', promocodeData);
+
+                // Преобразуем JSON строку в объект
+                try {
+                    config = JSON.parse(promocodeData.config);
+                    console.log('Распарсенный конфиг:', config);
+                } catch (jsonError) {
+                    console.error('Ошибка парсинга JSON:', jsonError);
+                    alert('Ошибка обработки данных конфигурации');
+                    return;
+                }
+            } catch (error) {
+                console.error('Ошибка при получении данных:', error);
+                alert('Ошибка при загрузке настроек');
+                return;
+            }
+
+            // Отображение настроек
             container.innerHTML = `
                 <h2>Настройки Кинотеатр</h2>
                 <label>Страна промокода</label>
@@ -159,20 +185,72 @@
                             </select>
                             <input type="text" id="new-address" placeholder="Введите новый адрес">
                             <input type="number" id="new-price" placeholder="Введите новую цену">
+                            
+                            <!-- Секция для отображения добавленных услуг -->
+                            <h3>Дополнительные услуги</h3>
+                            <div class='service_list' id="service-list"></div>
+
+                            <!-- Кнопка для добавления новой услуги -->
+                            <button id="show-add-service-btn">+ Добавить услугу</button>
+
+                            <!-- Поля для добавления новой услуги, скрытые по умолчанию -->
+                            <div id="add-service-container" style="display: none;">
+                                <input type="text" id="new-service-name" placeholder="Название услуги">
+                                <input type="number" id="new-service-price" placeholder="Цена услуги">
+                                <button id="save-service-btn">Сохранить услугу</button>
+                            </div>
+
                             <button class="save" data-modal="address">Сохранить</button>
                         </div>
                     </div>
                 </div>
-                <button id="open-modal-delete">Удалить промокод</button>
             `;
+
+            // Установка значений из конфига
+            document.getElementById('country').value = config.country;
+            document.getElementById('language').value = config.language;
+            document.getElementById('currency').value = config.currency;
+
+            // Проверяем наличие комнат в конфиге
+            const roomSelect = document.getElementById('room-select');
+            const addressInput = document.getElementById('new-address');
+            const priceInput = document.getElementById('new-price');
+            
+            if (config.rooms && config.rooms.length > 0) {
+                console.log('Комнаты найдены:', config.rooms);
+
+                // Устанавливаем данные для первой комнаты при загрузке
+                setRoomData(0);
+
+                roomSelect.addEventListener('change', function () {
+                    const selectedRoomIndex = roomSelect.value;
+                    console.log('Выбрана комната:', selectedRoomIndex);
+                    setRoomData(selectedRoomIndex);
+                });
+
+                function setRoomData(roomIndex) {
+                    const room = config.rooms[roomIndex];
+                    if (room) {
+                        console.log('Данные для комнаты:', room);
+                        addressInput.value = room.address || '';
+                        priceInput.value = room.price || '';
+                        renderServices(room.services || []); // Отображаем услуги для выбранной комнаты
+                    } else {
+                        console.warn(`Комната с индексом ${roomIndex} не найдена`);
+                        addressInput.value = '';
+                        priceInput.value = '';
+                    }
+                }
+            } else {
+                console.warn('Комнаты не найдены в конфиге');
+                addressInput.value = '';
+            }
 
             // Сохранение настроек
             document.getElementById('saveSettingsAntikino').addEventListener('click', async () => {
                 const country = document.getElementById('country').value;
                 const language = document.getElementById('language').value;
                 const currency = document.getElementById('currency').value;
-                const params1 = new URLSearchParams(window.location.search);
-                const promocodeId = params1.get('promocodeId');
 
                 const settingsData = {
                     country: country,
@@ -200,7 +278,7 @@
                 }
             });
 
-            // Обработчики событий для модальных окон
+            // Обработчики для модальных окон
             document.querySelectorAll('.open-modal').forEach(button => {
                 button.addEventListener('click', function () {
                     const modalType = this.getAttribute('data-modal');
@@ -208,39 +286,146 @@
                 });
             });
 
-            // Закрытие модального окна
             document.querySelectorAll('.close').forEach(button => {
                 button.addEventListener('click', function () {
                     this.closest('.modal').style.display = 'none';
                 });
             });
 
-            // Закрытие модального окна при клике вне его области
             window.addEventListener('click', function (event) {
                 if (event.target.classList.contains('modal')) {
                     event.target.style.display = 'none';
                 }
             });
 
-            // Сохранение данных и закрытие окна
+            let services = [];
+            // Функция для отображения услуг в интерфейсе
+            // Внутри функции renderServices
+            function renderServices(services) {
+                const serviceList = document.getElementById('service-list');
+                serviceList.innerHTML = ''; // Очищаем предыдущие услуги
+
+                services.forEach((service, index) => {
+                    const serviceElement = document.createElement('div');
+                    serviceElement.classList.add('service-item');
+                    serviceElement.innerHTML = `
+                        <span>${service.name}: ${service.price}</span>
+                        <button class="delete-service" data-index="${index}">🗑️</button>
+                    `;
+                    serviceList.appendChild(serviceElement);
+
+                    // Логика удаления услуги
+                    serviceElement.querySelector('.delete-service').addEventListener('click', async function () {
+                        const serviceIndex = parseInt(this.getAttribute('data-index')); // Получаем индекс из data-атрибута
+                        const serviceName = services[serviceIndex].name; // Сохраняем имя услуги перед удалением
+
+                        // Удаляем услугу из массива
+                        services.splice(serviceIndex, 1); 
+                        renderServices(services); // Перерисовываем услуги
+
+                        // Удаление услуги на сервере
+                        try {
+                            const response = await fetch(`/promocodeDeleteAntikinoService/${promocodeId}`, {
+                                method: 'POST', // Используйте метод POST
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ room: serviceIndex, name: serviceName }) // Используйте сохраненное имя услуги
+                            });
+
+                            if (!response.ok) {
+                                throw new Error('Ошибка при удалении услуги');
+                            }
+
+                            const result = await response.json();
+                            console.log('Услуга успешно удалена:', result);
+                            alert('Услуга успешно удалена!');
+
+                        } catch (error) {
+                            console.error('Ошибка:', error);
+                            alert('Ошибка при удалении услуги: ' + error.message);
+                        }
+                    });
+
+                });
+            }
+
+
+            // Логика для показа полей добавления новой услуги
+            const showAddServiceBtn = document.getElementById('show-add-service-btn');
+            const addServiceContainer = document.getElementById('add-service-container');
+            const saveServiceBtn = document.getElementById('save-service-btn');
+
+            showAddServiceBtn.addEventListener('click', () => {
+                addServiceContainer.style.display = 'block';
+                showAddServiceBtn.style.display = 'none';
+            });
+
+            // Добавление новой услуги
+            saveServiceBtn.addEventListener('click', async function () {
+                const roomIndex = document.getElementById('room-select').value;
+                const serviceName = document.getElementById('new-service-name').value;
+                const servicePrice = document.getElementById('new-service-price').value;
+
+                if (serviceName && servicePrice) {
+                    const newService = {
+                        room: roomIndex,
+                        name: serviceName,
+                        price: servicePrice
+                    }
+                    config.rooms[roomIndex].services = config.rooms[roomIndex].services || [];
+                    config.rooms[roomIndex].services.push(newService);
+                    renderServices(config.rooms[roomIndex].services); // Обновляем список услуг
+                    try {
+                    const response = await fetch(`/promocodeUpdateAntikinoServices/${promocodeId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(newService)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Ошибка при сохранении данных');
+                    }
+
+                    const result = await response.json();
+                    console.log('Данные успешно сохранены:', result);
+                    alert('Данные успешно сохранены!');
+
+                    // Закрытие модального окна
+                    document.querySelector(`.modal-address`).style.display = 'none';
+
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    alert('Ошибка при сохранении данных: ' + error.message);
+                }
+                    // Очищаем поля ввода
+                    document.getElementById('new-service-name').value = '';
+                    document.getElementById('new-service-price').value = '';
+
+                    // Скрываем контейнер добавления услуги
+                    addServiceContainer.style.display = 'none';
+                    showAddServiceBtn.style.display = 'block';
+                } else {
+                    alert('Пожалуйста, заполните все поля!');
+                }
+            });
+
+            // Сохранение данных для комнаты и закрытие окна
             document.querySelector('.save[data-modal="address"]').addEventListener('click', async function () {
                 const selectedRoomIndex = document.getElementById('room-select').value;
                 const newAddress = document.getElementById('new-address').value;
                 const newPrice = document.getElementById('new-price').value;
 
-                // Извлечение promocodeId из URL
-                const params = new URLSearchParams(window.location.search);
-                const promocodeId = params.get('promocodeId');
-
-                // Подготовка данных для отправки
                 const payload = {
                     roomIndex: selectedRoomIndex,
                     address: newAddress,
-                    price: newPrice
+                    price: newPrice,
+                    services: config.rooms[selectedRoomIndex].services // Добавляем услуги
                 };
 
                 try {
-                    // Отправка данных на сервер
                     const response = await fetch(`/promocodeUpdateAntikinoRoom/${promocodeId}`, {
                         method: 'POST',
                         headers: {
@@ -268,35 +453,353 @@
         }
 
 
-        function loadAntiTheatreSettings() {
+        async function loadAntiTheatreSettings() {
+            // Функция для открытия модального окна
+            window.openModal = function(modalSelector) {
+                const modal = document.querySelector(modalSelector);
+                if (modal) {
+                    modal.style.display = "block";
+                }
+            }
+
+            // Функция для закрытия модального окна
+            window.closeModal = function(modalSelector) {
+                const modal = document.querySelector(modalSelector);
+                if (modal) {
+                    modal.style.display = "none";
+                }
+            }
+
             const container = document.getElementById('promo-settings');
+            const params = new URLSearchParams(window.location.search);
+            const promocodeId = params.get('promocodeId');
+
+            // Загружаем текущие настройки промокода с сервера
+            let config;
+            try {
+                const response = await fetch(`/promocode/${promocodeId}`);
+                const promocodeData = await response.json();
+                console.log('Полученные данные промокода:', promocodeData);
+
+                // Преобразуем JSON строку в объект
+                try {
+                    config = JSON.parse(promocodeData.config);
+                    console.log('Распарсенный конфиг:', config);
+                } catch (jsonError) {
+                    console.error('Ошибка парсинга JSON:', jsonError);
+                    alert('Ошибка обработки данных конфигурации');
+                    return;
+                }
+            } catch (error) {
+                console.error('Ошибка при получении данных:', error);
+                alert('Ошибка при загрузке настроек');
+                return;
+            }
+
             container.innerHTML = `
                 <h2>Настройки Театра</h2>
                 <label>Страна промокода</label>
-                <select>
+                <select id="country">
                     <option value="UE">Украина UE</option>
                     <option value="KZ">Казахстан KZ</option>
                     <option value="AZ">Азербайджан AZ</option>
                     <option value="EU">Европа EU</option>
                 </select>
                 <label>Язык сайта</label>
-                <select>
+                <select id="language">
                     <option value="RU">Россия RU</option>
-                    <option value="UE">Украина UE </option>
+                    <option value="UE">Украина UE</option>
                     <option value="KZ">Казахстан KZ</option>
                     <option value="AZ">Азербайджан AZ</option>
                     <option value="PL">Польский PL</option>
                     <option value="EN">Английский EN</option>
                 </select>
-                <button>Изменить валюту</button>
-                <button>Изменить предпросмотр</button>
-                <button>Изменить адрес</button>
-                <button>Изменить цены</button>
-                <button>Изменить посадочные места</button>
-                <button>Изменить время</button>
-                <button>Удалить промокод</button>
+                <label>Валюта</label>
+                <select id="currency">
+                    <option value="RUB">RUB</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="UAH">UAH</option>
+                    <option value="KZT">KZT</option>
+                    <option value="AZN">AZN</option>
+                    <option value="PLN">PLN</option>
+                </select>
+                <button class="save-button" id="saveSettingsAntiTheatre">Сохранить изменения</button>
+
+                <!-- Кнопки для открытия модальных окон -->
+                <button id="openPricesModal">Настроить цены</button>
+                <button id="openSeatsModal">Настроить свободные места</button>
+
+                <!-- Модальное окно для настройки цен -->
+                <div class="modal modal-prices" style="display:none;">
+                    <div class="modal-content">
+                        <span class="close" onclick="closeModal('.modal-prices')">X</span>
+                        <h2>Настройки цен</h2>
+                        <div>
+                            <label for="price-row-1">Цена рядов 1-4:</label>
+                            <input type="number" id="price-row-1" placeholder="Введите цену" />
+                        </div>
+                        <div>
+                            <label for="price-row-2">Цена рядов 5-9:</label>
+                            <input type="number" id="price-row-2" placeholder="Введите цену" />
+                        </div>
+                        <div>
+                            <label for="price-row-3">Цена рядов 10-12:</label>
+                            <input type="number" id="price-row-3" placeholder="Введите цену" />
+                        </div>
+                        <div>
+                            <label for="price-loja">Цена Ложа:</label>
+                            <input type="number" id="price-loja" placeholder="Введите цену" />
+                        </div>
+                        <button id="savePricesSettings">Сохранить настройки</button>
+                    </div>
+                </div>
+
+                <!-- Модальное окно для настройки свободных мест -->
+                <div class="modal modal-seats" style="display:none;">
+                    <div class="modal-content">
+                        <span class="close" onclick="closeModal('.modal-seats')">X</span>
+                        <h2>Настройки свободных мест</h2>
+                        <div>
+                            <label for="seats-slider">Свободность мест (%): <span id="seats-value">50</span>%</label>
+                            <input type="range" id="seats-slider" min="0" max="100" value="50" />
+                        </div>
+                        <button id="saveSeatsSettings">Сохранить настройки</button>
+                    </div>
+                </div>
             `;
+
+            // Установка значений из конфига
+            document.getElementById('country').value = config.country;
+            document.getElementById('language').value = config.language;
+            document.getElementById('currency').value = config.currency;
+            const prices = config.prices;
+            document.getElementById('price-row-1').value = prices["1-4"];
+            document.getElementById('price-row-2').value = prices["5-9"];
+            document.getElementById('price-row-3').value = prices["10-12"];
+            document.getElementById('price-loja').value = prices["Ложа"];
+            const seatsSlider = document.getElementById('seats-slider');
+            seatsSlider.value = config.seats; // Установка значения слайдера
+            document.getElementById('seats-value').innerText = config.seats;
+
+            async function savePricesSettings() {
+                const prices = {
+                    "1-4": parseInt(document.getElementById('price-row-1').value) || 0,
+                    "5-9": parseInt(document.getElementById('price-row-2').value) || 0,
+                    "10-12": parseInt(document.getElementById('price-row-3').value) || 0,
+                    "Ложа": parseInt(document.getElementById('price-loja').value) || 0
+                };
+
+                const settingsData = { prices: prices }; // Оберните prices в объект
+
+                try {
+                    const response = await fetch(`/updatePricesTheatre/${promocodeId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(settingsData) // Сериализация в JSON
+                    });
+
+                    const result = await response.json();
+                    if (response.ok) {
+                        alert("Настройки цен успешно обновлены");
+                        closeModal('.modal-prices'); // Закрытие модального окна
+                    } else {
+                        alert("Ошибка: " + result.message);
+                    }
+                } catch (error) {
+                    alert("Ошибка сети: " + error.message);
+                }
+            }
+
+            // Сохранение настроек свободных мест
+            async function saveSeatsSettings() {
+                const seats = parseInt(document.getElementById('seats-slider').value) || 0;
+
+                const settingsData = { seats: seats };
+
+                try {
+                    const response = await fetch(`/updateSeatsTheatre/${promocodeId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(settingsData)
+                    });
+
+                    const result = await response.json();
+                    if (response.ok) {
+                        alert("Настройки свободных мест успешно обновлены");
+                        closeModal('.modal-seats'); // Закрытие модального окна
+                    } else {
+                        alert("Ошибка: " + result.message);
+                    }
+                } catch (error) {
+                    alert("Ошибка сети: " + error.message);
+                }
+            }
+
+            // Добавление обработчиков событий для кнопок сохранения
+            document.getElementById('savePricesSettings').addEventListener('click', savePricesSettings);
+            document.getElementById('saveSeatsSettings').addEventListener('click', saveSeatsSettings);
+
+
+            // Сохранение настроек
+            document.getElementById('saveSettingsAntiTheatre').addEventListener('click', async () => {
+                const country = document.getElementById('country').value;
+                const language = document.getElementById('language').value;
+                const currency = document.getElementById('currency').value;
+
+                const settingsData = {
+                    country: country,
+                    language: language,
+                    currency: currency
+                };
+
+                try {
+                    const response = await fetch(`/promocodeUpdateAntikino/${promocodeId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(settingsData)
+                    });
+
+                    const result = await response.json();
+                    if (response.ok) {
+                        alert("Настройки успешно обновлены");
+                    } else {
+                        alert("Ошибка: " + result.message);
+                    }
+                } catch (error) {
+                    alert("Ошибка сети: " + error.message);
+                }
+            });
+
+            // Обработчик для слайдера
+            document.getElementById('seats-slider').addEventListener('input', function() {
+                document.getElementById('seats-value').innerText = this.value;
+            });
+
+            // Открытие модальных окон
+            document.getElementById('openPricesModal').addEventListener('click', () => openModal('.modal-prices'));
+            document.getElementById('openSeatsModal').addEventListener('click', () => openModal('.modal-seats'));
         }
+
+
+        
+        async function loadExhibitionSettings() {
+            // Функция для открытия модального окна
+            window.openModal = function(modalSelector) {
+                const modal = document.querySelector(modalSelector);
+                if (modal) {
+                    modal.style.display = "block";
+                }
+            }
+
+            // Функция для закрытия модального окна
+            window.closeModal = function(modalSelector) {
+                const modal = document.querySelector(modalSelector);
+                if (modal) {
+                    modal.style.display = "none";
+                }
+            }
+
+            const container = document.getElementById('promo-settings');
+            const params = new URLSearchParams(window.location.search);
+            const promocodeId = params.get('promocodeId');
+
+            // Загружаем текущие настройки промокода с сервера
+            let config;
+            try {
+                const response = await fetch(`/promocode/${promocodeId}`);
+                const promocodeData = await response.json();
+                console.log('Полученные данные промокода:', promocodeData);
+
+                // Преобразуем JSON строку в объект
+                try {
+                    config = JSON.parse(promocodeData.config);
+                    console.log('Распарсенный конфиг:', config);
+                } catch (jsonError) {
+                    console.error('Ошибка парсинга JSON:', jsonError);
+                    alert('Ошибка обработки данных конфигурации');
+                    return;
+                }
+            } catch (error) {
+                console.error('Ошибка при получении данных:', error);
+                alert('Ошибка при загрузке настроек');
+                return;
+            }
+
+            container.innerHTML = `
+                <h2>Настройки Выставки</h2>
+                <label>Страна промокода</label>
+                <select id="country">
+                    <option value="UE">Украина UE</option>
+                    <option value="KZ">Казахстан KZ</option>
+                    <option value="AZ">Азербайджан AZ</option>
+                    <option value="EU">Европа EU</option>
+                </select>
+                <label>Язык сайта</label>
+                <select id="language">
+                    <option value="RU">Россия RU</option>
+                    <option value="UE">Украина UE</option>
+                    <option value="KZ">Казахстан KZ</option>
+                    <option value="AZ">Азербайджан AZ</option>
+                    <option value="PL">Польский PL</option>
+                    <option value="EN">Английский EN</option>
+                </select>
+                <label>Валюта</label>
+                <select id="currency">
+                    <option value="RUB">RUB</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="UAH">UAH</option>
+                    <option value="KZT">KZT</option>
+                    <option value="AZN">AZN</option>
+                    <option value="PLN">PLN</option>
+                </select>
+                <button class="save-button" id="saveSettingsAntiExhibition">Сохранить изменения</button>
+                <button class="">Настройка выставок</button>
+            `;
+
+            document.getElementById('country').value = config.country;
+            document.getElementById('language').value = config.language;
+            document.getElementById('currency').value = config.currency;
+
+            document.getElementById('saveSettingsAntiExhibition').addEventListener('click', async () => {
+                const country = document.getElementById('country').value;
+                const language = document.getElementById('language').value;
+                const currency = document.getElementById('currency').value;
+
+                const settingsData = {
+                    country: country,
+                    language: language,
+                    currency: currency
+                };
+
+                try {
+                    const response = await fetch(`/promocodeUpdateAntikino/${promocodeId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(settingsData)
+                    });
+
+                    const result = await response.json();
+                    if (response.ok) {
+                        alert("Настройки успешно обновлены");
+                    } else {
+                        alert("Ошибка: " + result.message);
+                    }
+                } catch (error) {
+                    alert("Ошибка сети: " + error.message);
+                }
+            });
+        }
+        
 
         // Функция для загрузки настроек Трейд
         function loadTradeSettings() {
@@ -332,6 +835,7 @@
                 <p>Здесь будут настройки, специфичные для BlaBlaCar промокода</p>
             `;
         }
+
 
         
     </script>

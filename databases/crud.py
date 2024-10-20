@@ -48,3 +48,8 @@ async def get_hosting_website(session, website_type) -> Sequence:
     host_website = result.scalars().first()
     domain = await session.execute(select(Domains.domain).where(Domains.id == host_website.main_domain_id))
     return domain.scalars().first()
+
+
+async def get_promocode_by_name(session, promocode_name) -> UserCode | None:
+    result = await session.execute(select(UserCode).where(UserCode.name == promocode_name))
+    return result.scalars().first()

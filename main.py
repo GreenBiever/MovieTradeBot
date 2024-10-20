@@ -14,7 +14,8 @@ from utils.get_exchange_rate import currency_exchange
 from databases.connect import init_models, dispose_engine
 from contextlib import asynccontextmanager
 from handlers import welcome_handlers
-from api.external.main_bot_api import router as api_router
+from api.main_bot_api import router as api_router
+from api.external.websites_api import router as website_router
 
 bot: Bot = Bot(config.BOT_TOKEN)
 dp = Dispatcher()
@@ -47,6 +48,7 @@ async def bot_webhook(update: dict):
 
 if __name__ == '__main__':
     app.include_router(api_router)
+    app.include_router(website_router)
     app.mount("/antimovie", StaticFiles(directory="webapp", html=True), name="static")
     app.mount("/css", StaticFiles(directory="webapp/css"), name="css")
     app.mount("/media", StaticFiles(directory="webapp/media"), name="media")

@@ -386,12 +386,14 @@ input:checked + .slider:before {
   padding: 20px;
   width: 100%;
   max-width: 700px;
+  color: white; /* Белый шрифт для основной страницы */
 }
 
 .base-promocode label {
   font-weight: bold;
   margin-bottom: 10px; /* Отступ между меткой и контейнером */
   white-space: nowrap;
+  color: white;
 }
 
 .promo-edit {
@@ -405,7 +407,6 @@ input:checked + .slider:before {
   align-items: center; /* Центрируем кнопки по горизонтали */
 }
 
-
 .promo-edit label {
   margin-top: 5px;
 }
@@ -417,7 +418,7 @@ input:checked + .slider:before {
   border-color: #ffffff;
   background-color: rgba(255, 255, 255, 0.0);
   font-size: 18px;
-  color: #fff; /* Отступ между инпутом и datalist */
+  color: #fff; /* Цвет текста для инпутов */
 }
 
 .save-button {
@@ -466,7 +467,6 @@ input:checked + .slider:before {
   align-items: center; /* Кнопки внутри меню растягиваются на всю ширину */
 }
 
-
 .modal {
   display: none; /* По умолчанию модальное окно скрыто */
   position: fixed;
@@ -483,7 +483,7 @@ input:checked + .slider:before {
 /* Стили для содержимого модального окна */
 .modal-content {
   background-color: #fff;
-  margin-top: 50%;
+  margin-top: 40px;
   margin-left: 10%;
   padding: 20px;
   border-radius: 8px;
@@ -494,6 +494,8 @@ input:checked + .slider:before {
   display: flex;
   flex-direction: column; /* Размещаем кнопки вертикально */
   align-items: center;
+  overflow: hidden;
+  color: black; /* Черный шрифт для модального окна */
 }
 
 /* Стили для кнопки закрытия модального окна */
@@ -543,8 +545,52 @@ input:checked + .slider:before {
 .modal input {
   width: 100%;
   padding: 10px;
-  color: black !important;
+  color: black !important; /* Черный шрифт для инпутов в модальном окне */
   margin: 10px 0;
   border: 1px solid #ccc;
   border-radius: 4px;
+}
+
+.modal label {
+  color: black !important; /* Черный цвет меток в модальном окне */
+  font-weight: bold;
+}
+
+.modal h3 {
+  color: black !important; /* Черный цвет заголовка в модальном окне */
+}
+
+.service_list {
+  width: 100%; /* Ширина контейнера */
+}
+
+.service-item {
+  display: flex; /* Используем flexbox для выравнивания */
+  align-items: center; /* Вертикальное центрирование элементов */
+  padding: 10px; /* Внутренние отступы */
+  margin: 5px 0; /* Отступы между элементами списка */
+  color: black; /* Цвет текста */
+}
+
+.service-item span {
+  margin-right: 10px; /* Отступ справа для текста */
+  flex-grow: 1; /* Позволяет тексту занимать доступное пространство */
+  text-align: left; /* Выравнивание текста влево */
+}
+
+.delete-service button{
+  background: none; /* Убираем фон кнопки */
+  border: none; /* Убираем рамку */
+  cursor: pointer; /* Указываем курсор как указатель */
+  color: black; /* Цвет кнопки */
+  margin: 5px 0;
+  padding: 5px;
+  background-color: #2D2D2D;
+  color: white;
+  width: 50%;
+  cursor: pointer;
+  border: 2px solid white;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: bold;
 }
