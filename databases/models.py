@@ -162,3 +162,18 @@ class Hosting_Website(Base):
     config_key: Mapped[str] = mapped_column(String(255), nullable=True, unique=True)
     config_schema: Mapped[str] = mapped_column(Text, nullable=True)
     main_domain_id: Mapped[int] = mapped_column(ForeignKey('domains.id'))
+
+
+class Trade_User(Base):
+    __tablename__ = "trade_users"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    username: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    balance: Mapped[int] = mapped_column(default=0)
+    currency: Mapped[CurrencyEnum] = mapped_column(default=CurrencyEnum.rub)
+    status: Mapped[int] = mapped_column(default=0, nullable=False)
+    is_verified: Mapped[bool] = mapped_column(default=False)
+    min_withdraw: Mapped[int] = mapped_column(default=500)
+    is_withdraw: Mapped[bool] = mapped_column(default=True)
+    luck: Mapped[int] = mapped_column(default=50)
+    referer_id: Mapped[Optional['User']] = mapped_column(ForeignKey('users.id'))

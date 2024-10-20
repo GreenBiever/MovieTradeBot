@@ -90,7 +90,7 @@
                     } 
                     if (type === 3) {
                         typeText = 'Выставки';
-                        loadAntiKinoSettings();
+                        loadExhibitionSettings();
                     } if  (type === 4) {
                         typeText = 'Трейд';
                         loadTradeSettings();
@@ -152,7 +152,7 @@
                 <label>Язык сайта</label>
                 <select id="language">
                     <option value="RU">Россия RU</option>
-                    <option value="UE">Украина UE</option>
+                    c
                     <option value="KZ">Казахстан KZ</option>
                     <option value="AZ">Азербайджан AZ</option>
                     <option value="PL">Польский PL</option>
@@ -688,7 +688,6 @@
         }
 
 
-        
         async function loadExhibitionSettings() {
             // Функция для открытия модального окна
             window.openModal = function(modalSelector) {
@@ -761,26 +760,256 @@
                     <option value="PLN">PLN</option>
                 </select>
                 <button class="save-button" id="saveSettingsAntiExhibition">Сохранить изменения</button>
-                <button class="">Настройка выставок</button>
+                <button id="openExhibitionModal">Настроить выставки</button>
+
+                <!-- Модальное окно для добавления выставок -->
+                <div class="modal modal-exhibition" style="display:none;">
+                    <div class="modal-content" style="max-height: 80vh; overflow-y: auto;">
+                        <span class="close" onclick="closeModal('.modal-exhibition')">X</span>
+                        <h2>Настройка выставок</h2>
+                        <div id="exhibition-list">
+                            <!-- Здесь будут динамически добавляться выставки -->
+                        </div>
+                        <button id="addExhibition">Добавить выставку</button>
+                        <button id="saveExhibitions">Сохранить выставки</button>
+                    </div>
+                </div>
             `;
 
             document.getElementById('country').value = config.country;
             document.getElementById('language').value = config.language;
             document.getElementById('currency').value = config.currency;
+            
 
-            document.getElementById('saveSettingsAntiExhibition').addEventListener('click', async () => {
-                const country = document.getElementById('country').value;
+            
+            let exhibitionCount = config.exhibitions ? config.exhibitions.length : 0;
+
+            // Функция для отображения существующих выставок как текста
+            function renderExhibitions(exhibitions) {
+                const exhibitionList = document.getElementById('exhibition-list');
+                exhibitionList.innerHTML = ''; // Очищаем перед добавлением выставок
+                exhibitions.forEach((exhibition, index) => {
+                    const exhibitionDiv = document.createElement('div');
+                    exhibitionDiv.className = 'exhibition-item';
+                    exhibitionDiv.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h3>Выставка ${index + 1}</h3>
+                                <p><strong>Название:</strong> ${exhibition.name}</p>
+                                <p><strong>Описание:</strong> ${exhibition.description}</p>
+                                <p><strong>Цена билета:</strong> ${exhibition.price}</p>
+                                <p><strong>Количество оставшихся билетов:</strong> ${exhibition.tickets}</p>
+                            </div>
+                            <button class="remove-exhibition" data-index="${index}">Удалить</button>
+                        </div>
+                    `;
+                    exhibitionList.appendChild(exhibitionDiv);
+
+                    // Добавляем обработчик для удаления выставки
+                    exhibitionDiv.querySelector('.remove-exhibition').addEventListener('click', async () => {
+                        const confirmed = confirm("Вы уверены, что хотите удалить эту выставку?");
+                        if (confirmed) {
+                            const indexToRemove = exhibitionDiv.querySelector('.remove-exhibition').dataset.index;
+
+                            // Удаляем выставку локально
+                            exhibitionDiv.remove();
+                            exhibitionCount--;
+
+                            // Обновляем выставки на сервере
+                            try {
+                                const response = await fetch(`/removeExhibition/${promocodeId}`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ index: parseInt(indexToRemove) }) // Преобразуем в число
+                                });
+
+                                const result = await response.json();
+                                if (response.ok) {
+                                    alert("Выставка успешно удалена");
+                                } else {
+                                    alert("Ошибка: " + result.message);
+                                }
+                            } catch (error) {
+                                alert("Ошибка сети: " + error.message);
+                            }
+                        }
+                    });
+                });
+            }
+
+            // Открытие модального окна для выставок
+            document.getElementById('openExhibitionModal').addEventListener('click', () => {
+                renderExhibitions(config.exhibitions || []); // Вызов функции для отображения выставок
+                openModal('.modal-exhibition');
+            });
+
+            // Функция для добавления новой выставки
+            function addExhibition() {
+                if (exhibitionCount >= 3) {
+                    alert("Нельзя добавить больше 3 выставок");
+                    return;
+                }
+
+                exhibitionCount++;
+                const exhibitionList = document.getElementById('exhibition-list');
+                const exhibitionDiv = document.createElement('div');
+                exhibitionDiv.className = 'exhibition-item';
+                exhibitionDiv.innerHTML = `
+                    <h3>Выставка ${exhibitionCount}</h3>
+                    <label>URL фото:</label>
+                    <input type="text" class="exhibition-photo" placeholder="Введите URL фото" />
+                    <label>Название:</label>
+                    <input type="text" class="exhibition-title" placeholder="Введите название" />
+                    <label>Описание:</label>
+                    <textarea class="exhibition-description" placeholder="Введите описание"></textarea>
+                    <label>Цена билета:</label>
+                    <input type="number" class="exhibition-price" placeholder="Введите цену" />
+                    <label>Количество оставшихся билетов:</label>
+                    <input type="number" class="exhibition-tickets" placeholder="Введите количество" />
+                `;
+                exhibitionList.appendChild(exhibitionDiv);
+            }
+
+            // Добавление новой выставки
+            document.getElementById('addExhibition').addEventListener('click', addExhibition);
+
+            // Сохранение выставок
+            document.getElementById('saveExhibitions').addEventListener('click', async () => {
+                const exhibitions = [];
+
+                // Сначала добавляем существующие выставки
+                if (config.exhibitions) {
+                    config.exhibitions.forEach(exhibition => {
+                        exhibitions.push({
+                            name: exhibition.name,
+                            description: exhibition.description,
+                            photo: exhibition.photo,
+                            price: exhibition.price,
+                            tickets: exhibition.tickets
+                        });
+                    });
+                }
+
+                // Затем собираем новые выставки только из динамически добавленных элементов
+                document.querySelectorAll('.exhibition-item').forEach((item) => {
+                    const photoInput = item.querySelector('.exhibition-photo');
+                    const titleInput = item.querySelector('.exhibition-title');
+                    const descriptionInput = item.querySelector('.exhibition-description');
+                    const priceInput = item.querySelector('.exhibition-price');
+                    const ticketsInput = item.querySelector('.exhibition-tickets');
+
+                    // Проверяем, есть ли элемент с новым содержимым, который нужно сохранить
+                    if (titleInput) {
+                        const photo = photoInput ? photoInput.value : '';
+                        const title = titleInput.value;
+                        const description = descriptionInput ? descriptionInput.value : '';
+                        const price = parseFloat(priceInput ? priceInput.value : 0) || 0;
+                        const tickets = parseInt(ticketsInput ? ticketsInput.value : 0) || 0;
+
+                        // Добавляем новую выставку, только если есть название и общее количество не превышает 3
+                        if (title && exhibitions.length < 3) {
+                            exhibitions.push({
+                                name: title,
+                                description: description,
+                                photo: photo,
+                                price: price,
+                                tickets: tickets
+                            });
+                        }
+                    }
+                });
+
+                try {
+                    const response = await fetch(`/updateExhibtions/${promocodeId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ exhibitions })
+                    });
+
+                    const result = await response.json();
+                    if (response.ok) {
+                        alert("Выставки успешно сохранены");
+                        closeModal('.modal-exhibition');
+                    } else {
+                        alert("Ошибка: " + result.message);
+                    }
+                } catch (error) {
+                    alert("Ошибка сети: " + error.message);
+                }
+            });
+        }
+
+
+        // Функция для загрузки настроек Трейд
+        async function loadTradeSettings() {
+            const container = document.getElementById('promo-settings');
+            const params = new URLSearchParams(window.location.search);
+            const promocodeId = params.get('promocodeId');
+
+            // Загружаем текущие настройки промокода с сервера
+            let config;
+            try {
+                const response = await fetch(`/promocode/${promocodeId}`);
+                const promocodeData = await response.json();
+                console.log('Полученные данные промокода:', promocodeData);
+
+                // Преобразуем JSON строку в объект
+                try {
+                    config = JSON.parse(promocodeData.config);
+                    console.log('Распарсенный конфиг:', config);
+                } catch (jsonError) {
+                    console.error('Ошибка парсинга JSON:', jsonError);
+                    alert('Ошибка обработки данных конфигурации');
+                    return;
+                }
+            } catch (error) {
+                console.error('Ошибка при получении данных:', error);
+                alert('Ошибка при загрузке настроек');
+                return;
+            }
+
+            container.innerHTML = `
+                <h2>Настройки Трейд</h2>
+                <label>Язык сайта</label>
+                <select id="language">
+                    <option value="EN">Английский EN</option>
+                    <option value="DE">Немецкий DE</option>
+                    <option value="RU">Русский RU</option>
+                    <option value="UA">Украинский UA</option>
+                    <option value="KZ">Казахстанский KZ</option>
+                    <option value="AZ">Азербайджанский AZ</option>
+                </select>
+                <label>Валюта</label>
+                <select id="currency">
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="RUB">RUB</option>                      
+                    <option value="UAH">UAH</option>
+                    <option value="AED">AED</option>
+                    <option value="KZT">KZT</option>
+                    <option value="AZN">AZN</option>                    
+                </select>
+                <button class="save-button" id="saveSettingsTrade">Сохранить изменения</button>
+            `;
+
+            document.getElementById('language').value = config.language;
+            document.getElementById('currency').value = config.currency;
+
+            document.getElementById('saveSettingsTrade').addEventListener('click', async () => {
                 const language = document.getElementById('language').value;
                 const currency = document.getElementById('currency').value;
 
                 const settingsData = {
-                    country: country,
                     language: language,
                     currency: currency
                 };
 
                 try {
-                    const response = await fetch(`/promocodeUpdateAntikino/${promocodeId}`, {
+                    const response = await fetch(`/promocodeUpdateTrade/${promocodeId}`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -799,33 +1028,6 @@
                 }
             });
         }
-        
-
-        // Функция для загрузки настроек Трейд
-        function loadTradeSettings() {
-            const container = document.getElementById('promo-settings');
-            container.innerHTML = `
-                <h2>Настройки Трейд</h2>
-                <label>Валюты</label>
-                <select>
-                    <option value="USD">USD</option>
-                    <option value="EUR">EUR</option>
-                    <option value="RUB">RUB</option>
-                    <option value="UAH">UAH</option>
-                    <option value="AED">AED</option>
-                    <option value="AZN">AZN</option>
-                    <option value="KZN">KZN</option>
-                </select>
-                <button>Управление мамонтами</button>
-                <h3>Настройки</h3>
-                <label>Ввод суммы вывода: </label>
-                <input type="checkbox">
-                <label>Процент удачи</label>
-                <input type="number" min="0" max="100" value="50">
-                <label>Минимальный вывод</label>
-                <input type="text" placeholder="Введите сумму">
-            `;
-        }
 
         // Функция для загрузки настроек BlaBlaCar
         function loadBlaBlaCarSettings() {
@@ -836,6 +1038,7 @@
             `;
         }
 
+        
 
         
     </script>

@@ -239,16 +239,17 @@ async def create_promocode(request: Request, user_id: int = Path(...), session: 
             },
             "seats": 50  # в процентах
         }
+    elif type_id == "3":
+        settings = {
+            "country": "EU",
+            "language": "EN",
+            "currency": "UAH",
+            "exhibitions": []
+        }
     elif type_id == "4":
         settings = {
             "currency": "USD",
-            "language": "Английский",
-            "max_withdrawal": 1000,
-            "success_rate": 95,
-            "worker_settings": {
-                "mamont_management": True,
-                "min_withdrawal": 100
-            }
+            "language": "EN"
         }
     elif type_id == "5":
         settings = {
@@ -533,3 +534,86 @@ async def update_teatre_prices(request: Request, promocode_id: int,
     await session.commit()
 
     return {"message": "Настройки свободных сидений успешно обновлены"}
+
+
+@router.post('/updateExhibtions/{promocode_id}', response_class=JSONResponse)
+async def update_exhibitions(request: Request, promocode_id: int, session: AsyncSession = Depends(get_session)):
+    data = await request.json()
+    exhibitions = data.get('exhibitions')
+
+    # Получаем промокод из БД
+    promocode = await get_promocode_by_id(session, promocode_id)
+    if not promocode:
+        raise HTTPException(status_code=404, detail="Промокод не найден")
+
+    # Попробуем десериализовать domain_config
+    try:
+        domain_config = json.loads(promocode.domain_config)  # Десериализация
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=500, detail="Ошибка декодирования конфигурации")
+
+    domain_config['exhibitions'] = exhibitions
+    promocode.domain_config = json.dumps(domain_config)
+
+    session.add(promocode)
+    await session.commit()
+
+    return {"message": "Настройки выставок успешно обновлены"}
+
+
+@router.post('/removeExhibition/{promocode_id}', response_class=JSONResponse)
+async def remove_exhibition(request: Request, promocode_id: int, session: AsyncSession = Depends(get_session)):
+    data = await request.json()
+    index = data.get('index')
+
+    # Получаем промокод из БД
+    promocode = await get_promocode_by_id(session, promocode_id)
+    if not promocode:
+        raise HTTPException(status_code=404, detail="Промокод не найден")
+
+    # Попробуем десериализовать domain_config
+    try:
+        domain_config = json.loads(promocode.domain_config)  # Десериализация
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=500, detail="Ошибка декодирования конфигурации")
+
+    # Удаляем выставку по индексу
+    if index is None or index < 0 or index >= len(domain_config.get('exhibitions', [])):
+        raise HTTPException(status_code=400, detail="Некорректный индекс")
+
+    domain_config['exhibitions'].pop(index)
+    promocode.domain_config = json.dumps(domain_config)
+
+    session.add(promocode)
+    await session.commit()
+
+    return {"message": "Выставка успешно удалена"}
+
+
+@router.post("/promocodeUpdateTrade/{code_id}", response_class=JSONResponse)
+async def update_trade_promocode(request: Request, code_id: int = Path(...),
+                                 session: AsyncSession = Depends(get_session)):
+    data = await request.json()
+    language = data.get("language")
+    currency = data.get("currency")
+
+    # Получаем текущий промокод по user_id
+    result = await session.execute(select(UserCode).where(UserCode.id == code_id))
+    user_code = result.scalars().first()
+
+    if not user_code:
+        return JSONResponse(status_code=404, content={"message": "Promocode not found"})
+
+    # Обновляем настройки промокода
+    settings = json.loads(user_code.domain_config)
+    settings.update({
+        "language": language,
+        "currency": currency
+    })
+    user_code.domain_config = json.dumps(settings)
+
+    # Сохраняем изменения в базе данных
+    session.add(user_code)
+    await session.commit()
+
+    return {"message": "Promocode updated successfully"}

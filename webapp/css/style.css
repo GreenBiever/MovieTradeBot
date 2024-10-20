@@ -594,3 +594,14 @@ input:checked + .slider:before {
   font-size: 14px;
   font-weight: bold;
 }
+
+.exhibition-item label,
+.exhibition-item input,
+.exhibition-item textarea {
+  display: block; /* Отображение каждого элемента на новой строке */
+  margin-bottom: 10px;
+}
+
+.exhibition-item h3 {
+  margin-top: 10px;
+}
