@@ -12,7 +12,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import insert, select, update
-from databases.models import User, UserGroup, UserRoles, UserCode, Hosting_Website, UserCodeType
+from databases.models import User, UserGroup, UserRoles, UserCode, Hosting_Website, UserCodeType, Trade_User
 from pydantic import BaseModel
 
 bot: Bot = Bot(config.BOT_TOKEN)
@@ -190,12 +190,10 @@ async def fetch_promocode_types(session: AsyncSession = Depends(get_session)):
 @router.get("/promocode/{code_id}", response_class=JSONResponse)
 async def get_promocode(request: Request, code_id: int = Path(...), session: AsyncSession = Depends(get_session)):
     promocode = await get_promocode_by_id(session, code_id)
-    id = promocode.id
-    name = promocode.name
-    type = promocode.type_id
-    domain_config = promocode.domain_config
-    return {'id': id, 'name': name, 'type': type, "config": domain_config}
-
+    if promocode:
+        return {'id': promocode.id, 'name': promocode.name, 'type': promocode.type_id, "user_id": promocode.user_id, "config": promocode.domain_config}
+    else:
+        raise HTTPException(status_code=404, detail="Промокод не найден")
 
 @router.post("/promocodeCreate/{user_id}", response_class=JSONResponse)
 async def create_promocode(request: Request, user_id: int = Path(...), session: AsyncSession = Depends(get_session)):
@@ -617,3 +615,32 @@ async def update_trade_promocode(request: Request, code_id: int = Path(...),
     await session.commit()
 
     return {"message": "Promocode updated successfully"}
+
+
+# Роутеры для контроля рефералов в трейд сайте
+@router.get("/promo_get_trade_users/{referer_id}", response_class=JSONResponse)
+async def get_trade_users(referer_id: int, session: AsyncSession = Depends(get_session)):
+    result = await session.execute(select(Trade_User).where(Trade_User.referer_id == referer_id))
+    users = result.scalars().all()
+    users_dict = {}
+    if users:
+        for user in users:
+            users_dict[user.id] = {
+                "username": user.username,
+                "balance": user.balance
+            }
+
+        return JSONResponse(content={"users": users_dict})
+    else:
+        raise HTTPException(status_code=404, detail="Пользователи не найдены")
+
+
+@router.get("/promo_trade_get_user/{user_id}", response_class=JSONResponse)
+async def get_trade_user(user_id: int, session: AsyncSession = Depends(get_session)):
+    result = await session.execute(select(Trade_User).where(Trade_User.id == user_id))
+    user = result.scalars().first()
+    if user:
+        text = {"username": user.username, "balance": user.balance, "currency": user.currency.name.upper(), "referer_id": user.referer_id, "status":  user.status, "is_verified": user.is_verified, "min_withdraw": user.min_withdraw, "is_withdraw": user.is_withdraw, "luck": user.luck}
+        return JSONResponse(content=text)
+    else:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")

@@ -952,9 +952,10 @@
 
             // Загружаем текущие настройки промокода с сервера
             let config;
+            let promocodeData;
             try {
                 const response = await fetch(`/promocode/${promocodeId}`);
-                const promocodeData = await response.json();
+                promocodeData = await response.json();
                 console.log('Полученные данные промокода:', promocodeData);
 
                 // Преобразуем JSON строку в объект
@@ -994,10 +995,128 @@
                     <option value="AZN">AZN</option>                    
                 </select>
                 <button class="save-button" id="saveSettingsTrade">Сохранить изменения</button>
+                <!-- Кнопка открытия модального окна -->
+                <button id="manageMammothsBtn">Управление мамонтами</button>
+
+                <!-- Модальное окно -->
+                <div id="manageMammothsModal" class="modal" style="display: none;">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h2>Управление пользователями</h2>
+                        
+                        <!-- Поле для поиска пользователей -->
+                        <input type="text" id="searchUserInput" placeholder="Введите ID пользователя">
+                        <button id="searchUserBtn">Найти пользователя</button>
+                        
+                        <!-- Список пользователей -->
+                        <ul id="userList"></ul>
+                    </div>
+                </div>
             `;
 
             document.getElementById('language').value = config.language;
             document.getElementById('currency').value = config.currency;
+            document.getElementById('manageMammothsBtn').addEventListener('click', openModal);
+            document.getElementById('searchUserBtn').addEventListener('click', searchUser);
+
+            const modal = document.getElementById('manageMammothsModal');
+            const closeModal = document.querySelector('.close');
+
+            // Открытие модального окна
+            function openModal() {
+                modal.style.display = 'block';
+                loadUsers(); // Загружаем список пользователей при открытии
+            }
+
+            // Закрытие модального окна
+            closeModal.onclick = function () {
+                modal.style.display = 'none';
+            };
+
+            // Закрытие при клике вне окна
+            window.onclick = function (event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            };
+
+            // Функция для загрузки всех пользователей
+            async function loadUsers() {
+                const userList = document.getElementById('userList');
+                const refererId = promocodeData.user_id;
+                if (!refererId) {
+                    console.error('ID реферера не найден в конфиге');
+                    alert('ID реферера не найден');
+                    return;
+                }
+                try {
+                    const response = await fetch(`/promo_get_trade_users/${refererId}`);
+                    const data = await response.json();
+
+                    // Очистка списка
+                    userList.innerHTML = '';
+                    
+                    // Добавляем каждого пользователя в список
+                    for (const [userId, user] of Object.entries(data.users)) {
+                        const li = document.createElement('li');
+                        li.innerHTML = `ID: ${userId}, Username: ${user.username} <button class="selectUserBtn" data-id="${userId}">Выбрать</button>`;
+                        userList.appendChild(li);
+
+                        // Добавляем обработчик события для кнопки выбора пользователя
+                        li.querySelector('.selectUserBtn').addEventListener('click', () => openUserMenu(userId));
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки пользователей:', error);
+                    alert('Ошибка при загрузке списка пользователей');
+                }
+            }
+
+            // Функция поиска пользователя по ID
+            async function searchUser() {
+                const searchInput = document.getElementById('searchUserInput').value;
+                if (searchInput) {
+                    openUserMenu(searchInput); // Переход к редактированию найденного пользователя
+                } else {
+                    alert('Введите ID пользователя');
+                }
+            }
+
+            // Функция для открытия меню пользователя с информацией
+            async function openUserMenu(userId) {
+                try {
+                    const response = await fetch(`/promo_trade_get_user/${userId}`);
+                    const userData = await response.json();
+
+                    // Открываем модальное окно с информацией о пользователе
+                    const userMenu = document.createElement('div');
+                    userMenu.className = 'user-menu';
+                    userMenu.innerHTML = `
+                        <h3>Пользователь: ${userData.username}</h3>
+                        <p><strong>Баланс:</strong> ${userData.balance}</p>
+                        <p><strong>Валюта:</strong> ${userData.currency}</p>
+                        <p><strong>Статус:</strong> ${userData.status}</p>
+                        <p><strong>Верифицирован:</strong> ${userData.is_verified}</p>
+                        <p><strong>Мин. вывод:</strong> ${userData.min_withdraw}</p>
+                        <p><strong>Возможен вывод:</strong> ${userData.is_withdraw}</p>
+                        <p><strong>Удача:</strong> ${userData.luck}</p>
+                        <button id="editUserBtn">Редактировать</button>
+                    `;
+
+                    // Очистка и добавление меню в модальное окно
+                    modal.querySelector('.modal-content').innerHTML = '';
+                    modal.querySelector('.modal-content').appendChild(userMenu);
+
+                    // Добавляем обработчик для редактирования пользователя
+                    document.getElementById('editUserBtn').addEventListener('click', () => {
+                        // Реализация логики редактирования
+                        alert('Редактирование пока не реализовано');
+                    });
+                } catch (error) {
+                    console.error('Ошибка при загрузке информации о пользователе:', error);
+                    alert('Ошибка при загрузке информации о пользователе');
+                }
+            }
+
 
             document.getElementById('saveSettingsTrade').addEventListener('click', async () => {
                 const language = document.getElementById('language').value;

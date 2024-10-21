@@ -176,4 +176,4 @@ class Trade_User(Base):
     min_withdraw: Mapped[int] = mapped_column(default=500)
     is_withdraw: Mapped[bool] = mapped_column(default=True)
     luck: Mapped[int] = mapped_column(default=50)
-    referer_id: Mapped[Optional['User']] = mapped_column(ForeignKey('users.id'))
+    referer_id: Mapped[Optional['User']] = mapped_column(ForeignKey('users.tg_id'))
