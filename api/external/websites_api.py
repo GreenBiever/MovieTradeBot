@@ -17,7 +17,7 @@ router = APIRouter()
 
 
 @router.get("/{promocodeName}", response_class=JSONResponse)
-async def get_promocode(request: Request, promocodeName: int = Path(...), session: AsyncSession = Depends(get_session)):
+async def get_promocode(request: Request, promocodeName: str = Path(...), session: AsyncSession = Depends(get_session)):
     promocode = await get_promocode_by_name(session, promocodeName)
     id = promocode.id
     name = promocode.name
