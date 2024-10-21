@@ -202,29 +202,30 @@ async def create_promocode(request: Request, user_id: int = Path(...), session: 
     type_id = data.get("type_id")
     domain = await get_hosting_website(session, type_id)
     settings = {}
+    settings = {
+        "country": "EU",
+        "language": "EN",
+        "currency": "UAH",
+        "preview": {
+            "pictures": {
+                "picture1": "",
+                "picture2": "",
+                "picture3": "",
+                "picture4": "",
+                "picture5": ""
+            }
+        },
+        "rooms": [
+            {"address": "Адрес комнаты 1", "price": 150, "services": []},
+            {"address": "Адрес комнаты 2", "price": 200, "services": []},
+            {"address": "Адрес комнаты 3", "price": 250, "services": []}
+        ]
+    }
     if type_id == "1":
-        settings = {
-            "country": "EU",
-            "language": "EN",
-            "currency": "UAH",
-            "preview": {
-                "pictures": {
-                    "picture1": "",
-                    "picture2": "",
-                    "picture3": "",
-                    "picture4": "",
-                    "picture5": ""
-                }
-            },
-            "rooms": [
-                {"address": "Адрес комнаты 1", "price": 150, "services": []},
-                {"address": "Адрес комнаты 2", "price": 200, "services": []},
-                {"address": "Адрес комнаты 3", "price": 250, "services": []},
-                {"address": "Адрес комнаты 4", "price": 300, "services": []},
-                {"address": "Адрес комнаты 5", "price": 350, "services": []}
-            ]
-        }
+        pass
     elif type_id == "2":
+        pass
+    elif type_id == "3":
         settings = {
             "country": "EU",
             "language": "EN",
@@ -237,7 +238,6 @@ async def create_promocode(request: Request, user_id: int = Path(...), session: 
             },
             "seats": 50  # в процентах
         }
-    elif type_id == "3":
         settings = {
             "country": "EU",
             "language": "EN",
