@@ -4,3 +4,7 @@ aiosqlite
 fastapi
 uvicorn
 forex-python
+pillow
+python-dotenv
+aiomysql
+jinja2

@@ -1,21 +1,19 @@
-import asyncio, json, logging
+import logging
+from contextlib import asynccontextmanager
 
 import uvicorn
-from aiogram.exceptions import TelegramBadRequest
-from aiogram.filters import Command
-from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram import Bot, Dispatcher, F, Router
-from aiogram.types import Message, FSInputFile
+from aiogram import Bot, Dispatcher
 from aiogram import types
+from aiogram.exceptions import TelegramBadRequest
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+
 import config
-from utils.get_exchange_rate import currency_exchange
-from databases.connect import init_models, dispose_engine
-from contextlib import asynccontextmanager
-from handlers import welcome_handlers
-from api.main_bot_api import router as api_router
 from api.external.websites_api import router as website_router
+from api.main_bot_api import router as api_router
+from databases.connect import init_models, dispose_engine
+from handlers import welcome_handlers, main_handlers
+from utils.get_exchange_rate import currency_exchange
 
 bot: Bot = Bot(config.BOT_TOKEN)
 dp = Dispatcher()
@@ -53,4 +51,5 @@ if __name__ == '__main__':
     app.mount("/css", StaticFiles(directory="webapp/css"), name="css")
     app.mount("/media", StaticFiles(directory="webapp/media"), name="media")
     dp.include_routers(welcome_handlers.router)
+    dp.include_routers(main_handlers.router)
     uvicorn.run(app, host="0.0.0.0", port=config.WEBHOOK_PORT)

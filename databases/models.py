@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import Optional
 from .connect import Base
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import update
+from sqlalchemy import update, Table, Column, Integer
 import config
 from aiogram import types, Bot
 
@@ -28,13 +28,13 @@ class User(Base):
     payment_notifications: Mapped[bool] = mapped_column(default=False)
     navigation_notifications: Mapped[bool] = mapped_column(default=False)
     currency: Mapped[CurrencyEnum] = mapped_column(default=CurrencyEnum.usd)
-    is_verified: Mapped[bool] = mapped_column(default=False)
     join_date: Mapped[datetime] = mapped_column(default=datetime.now())
     group_id: Mapped[int | None] = mapped_column(ForeignKey('usergroup.id'))
     role_id: Mapped[int | None] = mapped_column(ForeignKey('userroles.id'))
     referer_id: Mapped[Optional['User']] = mapped_column(ForeignKey('users.id'))
     referals: Mapped[list['User']] = relationship('User', back_populates='referer')
     referer: Mapped[Optional['User']] = relationship('User', back_populates='referals', remote_side=[id])
+    categories = relationship('DrawingCategory', secondary='drawing_category_allowed_users', back_populates='users')
 
     async def get_balance(self) -> float:
         '''Return user balance converted to user currency'''
@@ -106,7 +106,7 @@ class UserCodeType(Base):
     __tablename__ = "usercodetype"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name:  Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    name: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
 
 
 class ProfitType(Base):
@@ -139,7 +139,7 @@ class Payment(Base):
     amount: Mapped[float] = mapped_column(Float, nullable=False)
     currency: Mapped[CurrencyEnum] = mapped_column(default=CurrencyEnum.rub)
     type: Mapped[int] = mapped_column(String(255), nullable=False)
-    is_refund:  Mapped[bool] = mapped_column(default=False)
+    is_refund: Mapped[bool] = mapped_column(default=False)
     service: Mapped[str] = mapped_column(String(255), nullable=False)
     worker: Mapped[int] = mapped_column(ForeignKey('users.id'))
     status: Mapped[bool] = mapped_column(default=False)
@@ -151,7 +151,7 @@ class Domains(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     domain: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     created_at: Mapped[datetime] = mapped_column(default=datetime.now())
-    ssl_certificate:  Mapped[str] = mapped_column(Text, nullable=True)
+    ssl_certificate: Mapped[str] = mapped_column(Text, nullable=True)
 
 
 class Hosting_Website(Base):
@@ -177,3 +177,20 @@ class Trade_User(Base):
     is_withdraw: Mapped[bool] = mapped_column(default=True)
     luck: Mapped[int] = mapped_column(default=50)
     referer_id: Mapped[Optional['User']] = mapped_column(ForeignKey('users.tg_id'))
+
+
+class DrawingCategory(Base):
+    __tablename__ = 'drawing_category'
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+
+    # Связь многие-ко-многим через вспомогательную таблицу
+    users = relationship('User', secondary='drawing_category_allowed_users', back_populates='categories')
+
+
+class DrawingCategoryAllowedUsers(Base):
+    __tablename__ = 'drawing_category_allowed_users'
+
+    category_id: Mapped[int] = mapped_column(ForeignKey('drawing_category.id'), nullable=False, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.tg_id'), nullable=False, primary_key=True)

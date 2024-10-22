@@ -1,9 +1,9 @@
 from typing import List, Sequence
 
-from sqlalchemy import select, update
+from sqlalchemy import select, update, insert, delete
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
-from databases.models import User, UserCode, Hosting_Website, UserCodeType, Domains
+from databases.models import User, UserCode, Hosting_Website, UserCodeType, Domains, ProfitType, UserGroup, UserRoles, DrawingCategory
 from databases.enums import CurrencyEnum
 from aiogram import Bot
 from keyboards import keyboard
@@ -53,3 +53,60 @@ async def get_hosting_website(session, website_type) -> Sequence:
 async def get_promocode_by_name(session, promocode_name) -> UserCode | None:
     result = await session.execute(select(UserCode).where(UserCode.name == promocode_name))
     return result.scalars().first()
+
+
+async def init_db(session: AsyncSession):
+    result = await session.execute(select(ProfitType))
+    if not result.scalars().all():  # Если таблица пустая
+        await session.execute(insert(ProfitType).values([
+            {'id': 1, 'name': 'Первая оплата', 'is_unique': True, 'payout_percent': 0.6},
+            {'id': 2, 'name': 'X-Оплата', 'is_unique': False, 'payout_percent': 0.5},
+            {'id': 3, 'name': 'Возврат', 'is_unique': False, 'payout_percent': 0.45},
+            {'id': 4, 'name': 'Прямой перевод', 'is_unique': True, 'payout_percent': 0.55},
+            {'id': 5, 'name': 'Обнал', 'is_unique': False, 'payout_percent': 0.45}
+        ]))
+
+    # Проверка и вставка данных в таблицу UserCodeType
+    result = await session.execute(select(UserCodeType))
+    if not result.scalars().all():  # Если таблица пустая
+        await session.execute(insert(UserCodeType).values([
+            {'id': 1, 'name': 'Антикино'},
+            {'id': 2, 'name': 'Театр'},
+            {'id': 3, 'name': 'Выставки'},
+            {'id': 4, 'name': 'Трейд'},
+            {'id': 5, 'name': 'BlaBlaCar'}
+        ]))
+
+    # Проверка и вставка данных в таблицу UserGroup
+    result = await session.execute(select(UserGroup))
+    if not result.scalars().all():  # Если таблица пустая
+        await session.execute(insert(UserGroup).values([
+            {'id': 1, 'name': 'Silver', 'percent_bonus': 0, 'code_limit': 5},
+            {'id': 2, 'name': 'Gold', 'percent_bonus': 0.01, 'code_limit': 10},
+            {'id': 3, 'name': 'Titanium', 'percent_bonus': 0.02, 'code_limit': 7},
+            {'id': 4, 'name': 'Sapphire', 'percent_bonus': 0.03, 'code_limit': 7},
+            {'id': 5, 'name': 'Ruby', 'percent_bonus': 0.04, 'code_limit': 10},
+            {'id': 6, 'name': 'Diamond', 'percent_bonus': 0.05, 'code_limit': 30}
+        ]))
+
+    # Проверка и вставка данных в таблицу UserRoles
+    result = await session.execute(select(UserRoles))
+    if not result.scalars().all():  # Если таблица пустая
+        await session.execute(insert(UserRoles).values([
+            {'id': 1, 'name': '🥷🏿 Воркер'},
+            {'id': 2, 'name': '💳 Вбивер'},
+            {'id': 3, 'name': '🤴 Админ'},
+            {'id': 4, 'name': '👨‍💻 Прогер'},
+            {'id': 5, 'name': '📣 Саппорт'}
+        ]))
+
+    result = await session.execute(select(DrawingCategory))
+    if not result.scalars().all():  # Если таблица пустая
+        await session.execute(insert(DrawingCategory).values([
+            {'id': 1, 'name': '🎟 Билеты'},
+            {'id': 2, 'name': '🆘 ТП'},
+            {'id': 3, 'name': '🌐 Сайт'},
+            {'id': 4, 'name': '🏦 Банк'}
+        ]))
+
+    await session.commit()  # Коммит изменений вне контекста session.begin()
