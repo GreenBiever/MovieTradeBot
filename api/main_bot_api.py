@@ -228,10 +228,10 @@ async def create_promocode(request: Request, user_id: int = Path(...), session: 
             "language": "EN",
             "currency": "UAH",
             "prices": {
-                "1-4": 100,
-                "5-9": 150,
-                "10-12": 200,
-                "Ложа": 300
+                "1st": 100,
+                "2nd": 150,
+                "3rd": 200,
+                "Vip": 300
             },
             "seats": 50  # в процентах
         }
@@ -249,13 +249,8 @@ async def create_promocode(request: Request, user_id: int = Path(...), session: 
         }
     elif type_id == "5":
         settings = {
-            "country": "Россия",
-            "language": "Русский",
-            "currency": "RUB",
-            "seating": {
-                "capacity": 80
-            },
-            "time": f"{datetime.now().isoformat()}"
+            "currency": "USD",
+            "language": "EN"
         }
 
     settings_json = json.dumps(settings)  # Сериализуем настройки в JSON
@@ -642,3 +637,29 @@ async def get_trade_user(user_id: int, session: AsyncSession = Depends(get_sessi
         return JSONResponse(content=text)
     else:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
+
+
+@router.post("/promo_trade_update_user/{user_id}", response_class=JSONResponse)
+async def update_trade_user(request: Request, user_id: int, session: AsyncSession = Depends(get_session)):
+    data = await request.json()
+    balance = data.get("balance")
+    is_blocked = data.get("is_blocked")
+    is_verified = data.get("is_verified")
+    is_withdraw = data.get("is_withdraw")
+    luck = data.get("luck")
+    min_widtraw = data.get("min_withdraw")
+    result = await session.execute(select(Trade_User).where(Trade_User.id == user_id))
+    user = result.scalars().first()
+    if user:
+        user.balance = balance
+        user.is_blocked = is_blocked
+        user.is_verified = is_verified
+        user.is_withdraw = is_withdraw
+        user.luck = luck
+        user.min_withdraw = min_widtraw
+        session.add(user)
+        await session.commit()
+        return {"message": "Пользователь обновлен"}
+    else:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+

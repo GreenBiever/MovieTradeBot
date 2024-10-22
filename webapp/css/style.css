@@ -605,3 +605,49 @@ input:checked + .slider:before {
 .exhibition-item h3 {
   margin-top: 10px;
 }
+
+/* Стили для тумблера */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;  /* ширина всего тумблера */
+  height: 25px; /* высота всего тумблера */
+}
+
+.switch input {
+  opacity: 0; /* прячем исходный input */
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 25px; /* закругленные углы для внешней части тумблера */
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 19px; /* высота ползунка */
+  width: 19px;  /* ширина ползунка */
+  left: 3px;    /* отступ слева */
+  bottom: 3px;  /* отступ снизу */
+  background-color: white;
+  border-radius: 50%; /* делаем круглый ползунок */
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #007BFF; /* цвет фона при активном тумблере */
+}
+
+input:checked + .slider:before {
+  transform: translateX(25px); /* перемещение ползунка вправо при активном тумблере */
+}

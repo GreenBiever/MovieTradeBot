@@ -534,19 +534,19 @@
                         <span class="close" onclick="closeModal('.modal-prices')">X</span>
                         <h2>Настройки цен</h2>
                         <div>
-                            <label for="price-row-1">Цена рядов 1-4:</label>
+                            <label for="price-row-1">Цена 1st:</label>
                             <input type="number" id="price-row-1" placeholder="Введите цену" />
                         </div>
                         <div>
-                            <label for="price-row-2">Цена рядов 5-9:</label>
+                            <label for="price-row-2">Цена 2nd:</label>
                             <input type="number" id="price-row-2" placeholder="Введите цену" />
                         </div>
                         <div>
-                            <label for="price-row-3">Цена рядов 10-12:</label>
+                            <label for="price-row-3">Цена 3rd:</label>
                             <input type="number" id="price-row-3" placeholder="Введите цену" />
                         </div>
                         <div>
-                            <label for="price-loja">Цена Ложа:</label>
+                            <label for="price-loja">Цена VIP:</label>
                             <input type="number" id="price-loja" placeholder="Введите цену" />
                         </div>
                         <button id="savePricesSettings">Сохранить настройки</button>
@@ -572,20 +572,20 @@
             document.getElementById('language').value = config.language;
             document.getElementById('currency').value = config.currency;
             const prices = config.prices;
-            document.getElementById('price-row-1').value = prices["1-4"];
-            document.getElementById('price-row-2').value = prices["5-9"];
-            document.getElementById('price-row-3').value = prices["10-12"];
-            document.getElementById('price-loja').value = prices["Ложа"];
+            document.getElementById('price-row-1').value = prices["1st"];
+            document.getElementById('price-row-2').value = prices["2nd"];
+            document.getElementById('price-row-3').value = prices["3rd"];
+            document.getElementById('price-loja').value = prices["Vip"];
             const seatsSlider = document.getElementById('seats-slider');
             seatsSlider.value = config.seats; // Установка значения слайдера
             document.getElementById('seats-value').innerText = config.seats;
 
             async function savePricesSettings() {
                 const prices = {
-                    "1-4": parseInt(document.getElementById('price-row-1').value) || 0,
-                    "5-9": parseInt(document.getElementById('price-row-2').value) || 0,
-                    "10-12": parseInt(document.getElementById('price-row-3').value) || 0,
-                    "Ложа": parseInt(document.getElementById('price-loja').value) || 0
+                    "1st": parseInt(document.getElementById('price-row-1').value) || 0,
+                    "2n": parseInt(document.getElementById('price-row-2').value) || 0,
+                    "3rd": parseInt(document.getElementById('price-row-3').value) || 0,
+                    "Vip": parseInt(document.getElementById('price-loja').value) || 0
                 };
 
                 const settingsData = { prices: prices }; // Оберните prices в объект
@@ -1023,7 +1023,7 @@
             // Открытие модального окна
             function openModal() {
                 modal.style.display = 'block';
-                loadUsers(); // Загружаем список пользователей при открытии
+                loadUsers(); 
             }
 
             // Закрытие модального окна
@@ -1041,19 +1041,34 @@
             // Функция для загрузки всех пользователей
             async function loadUsers() {
                 const userList = document.getElementById('userList');
-                const refererId = promocodeData.user_id;
-                if (!refererId) {
-                    console.error('ID реферера не найден в конфиге');
-                    alert('ID реферера не найден');
+
+                // Проверка, существует ли элемент userList
+                if (!userList) {
+                    console.error('Контейнер для списка пользователей не найден');
                     return;
                 }
-                try {
-                    const response = await fetch(`/promo_get_trade_users/${refererId}`);
-                    const data = await response.json();
 
-                    // Очистка списка
+                const params = new URLSearchParams(window.location.search);
+                const promocodeId = params.get('promocodeId');
+                let promocodeData;
+
+                try {
+                    const response = await fetch(`/promocode/${promocodeId}`);
+                    promocodeData = await response.json();
+
+                    const refererId = promocodeData.user_id;
+                    if (!refererId) {
+                        console.error('ID реферера не найден в конфиге');
+                        alert('ID реферера не найден');
+                        return;
+                    }
+
+                    const usersResponse = await fetch(`/promo_get_trade_users/${refererId}`);
+                    const data = await usersResponse.json();
+
+                    // Очистка списка пользователей
                     userList.innerHTML = '';
-                    
+
                     // Добавляем каждого пользователя в список
                     for (const [userId, user] of Object.entries(data.users)) {
                         const li = document.createElement('li');
@@ -1069,6 +1084,7 @@
                 }
             }
 
+
             // Функция поиска пользователя по ID
             async function searchUser() {
                 const searchInput = document.getElementById('searchUserInput').value;
@@ -1079,41 +1095,239 @@
                 }
             }
 
+
             // Функция для открытия меню пользователя с информацией
             async function openUserMenu(userId) {
                 try {
                     const response = await fetch(`/promo_trade_get_user/${userId}`);
+                    if (!response.ok) {
+                        console.error('Ошибка при получении данных о пользователе:', response.statusText);
+                        alert('Такого пользователя нет!');
+                        return false;  // Если запрос не удался, возвращаем false
+                    }
+
                     const userData = await response.json();
+
+                    // Проверяем, существуют ли данные пользователя
+                    if (!userData || !userData.username) {
+                        console.error('Пользователь не найден');
+                        return false;  // Если пользователь не найден, возвращаем false
+                    }
 
                     // Открываем модальное окно с информацией о пользователе
                     const userMenu = document.createElement('div');
                     userMenu.className = 'user-menu';
                     userMenu.innerHTML = `
+                        <button id="backToListBtn">Назад к списку</button>  <!-- Кнопка "Назад" -->
                         <h3>Пользователь: ${userData.username}</h3>
-                        <p><strong>Баланс:</strong> ${userData.balance}</p>
-                        <p><strong>Валюта:</strong> ${userData.currency}</p>
-                        <p><strong>Статус:</strong> ${userData.status}</p>
-                        <p><strong>Верифицирован:</strong> ${userData.is_verified}</p>
-                        <p><strong>Мин. вывод:</strong> ${userData.min_withdraw}</p>
-                        <p><strong>Возможен вывод:</strong> ${userData.is_withdraw}</p>
-                        <p><strong>Удача:</strong> ${userData.luck}</p>
-                        <button id="editUserBtn">Редактировать</button>
+                        <label><strong>Баланс:</strong></label>
+                        <input type="number" id="balanceInput" value="${userData.balance}">
+                        <label><strong>Мин. вывод:</strong></label>
+                        <input type="number" id="minWithdrawInput" value="${userData.min_withdraw}">
+                        <label><strong>Удача:</strong></label>
+                        <div class="luck-container">
+                            <input type="range" id="luckSlider" min="0" max="100" value="${userData.luck}">
+                            <span id="luckValue">${userData.luck}%</span>
+                        </div>
+                        <!-- Тумблер блокировки пользователя -->
+                        <label><strong>Заблокировать пользователя:</strong></label>
+                        <label class="switch">
+                            <input type="checkbox" id="isBlockedCheckbox" ${userData.is_blocked ? 'checked' : ''}>
+                            <span class="slider"></span>
+                        </label>
+                        <!-- Тумблер верификации пользователя -->
+                        <label><strong>Верифицирован:</strong></label>
+                        <label class="switch">
+                            <input type="checkbox" id="isVerifiedCheckbox" ${userData.is_verified ? 'checked' : ''}>
+                            <span class="slider"></span>
+                        </label>
+                        <!-- Тумблер разрешения вывода -->
+                        <label><strong>Разрешение вывода:</strong></label>
+                        <label class="switch">
+                            <input type="checkbox" id="isWithdrawCheckbox" ${userData.is_withdraw ? 'checked' : ''}>
+                            <span class="slider"></span>
+                        </label>
+                        
+                        <button id="saveUserChangesBtn">Сохранить изменения</button>
+                        <button id="viewUserStatsBtn">Открыть статистику</button>
                     `;
 
                     // Очистка и добавление меню в модальное окно
                     modal.querySelector('.modal-content').innerHTML = '';
                     modal.querySelector('.modal-content').appendChild(userMenu);
 
-                    // Добавляем обработчик для редактирования пользователя
-                    document.getElementById('editUserBtn').addEventListener('click', () => {
-                        // Реализация логики редактирования
-                        alert('Редактирование пока не реализовано');
+                    // Назад к списку пользователей
+                    document.getElementById('backToListBtn').addEventListener('click', async () => {
+                        // Очищаем содержимое модального окна
+                        modal.querySelector('.modal-content').innerHTML = ''; // Очистка текущего содержимого
+                        
+                        // Восстанавливаем заголовок и элементы управления
+                        const header = document.createElement('h2');
+                        header.innerText = 'Управление пользователями';
+                        
+                        const searchInput = document.createElement('input');
+                        searchInput.type = 'text';
+                        searchInput.id = 'searchUserInput';
+                        searchInput.placeholder = 'Введите ID пользователя';
+                        
+                        const searchButton = document.createElement('button');
+                        searchButton.id = 'searchUserBtn';
+                        searchButton.innerText = 'Найти пользователя';
+                        
+                        // Создаем новый контейнер для списка пользователей
+                        const newUserList = document.createElement('ul');
+                        newUserList.id = 'userList';
+                        
+                        // Добавляем все элементы в модальное окно
+                        const modalContent = modal.querySelector('.modal-content');
+                        modalContent.appendChild(header);
+                        modalContent.appendChild(searchInput);
+                        modalContent.appendChild(searchButton);
+                        modalContent.appendChild(newUserList);
+                        
+                        // Загружаем список пользователей
+                        await loadUsers(); // Загрузить список пользователей
+
+                        // Привязываем обработчик события к кнопке поиска
+                        searchButton.addEventListener('click', searchUser);
                     });
+
+
+                    // Обновляем значение отображаемого слайдера
+                    document.getElementById('luckSlider').addEventListener('input', function () {
+                        document.getElementById('luckValue').innerText = `${this.value}%`;
+                    });
+
+                    // Сохраняем изменения пользователя
+                    document.getElementById('saveUserChangesBtn').addEventListener('click', async () => {
+                        await saveUserChanges(userId);
+                    });
+
+                    // Открываем статистику пользователя
+                    document.getElementById('viewUserStatsBtn').addEventListener('click', async () => {
+                        await viewUserStatistics(userId);
+                    });
+
+                    return true;  // Если все успешно, возвращаем true
+
                 } catch (error) {
                     console.error('Ошибка при загрузке информации о пользователе:', error);
                     alert('Ошибка при загрузке информации о пользователе');
+                    return false;  // Если произошла ошибка, возвращаем false
                 }
             }
+
+
+
+            // Функция для сохранения изменений пользователя
+            async function saveUserChanges(userId) {
+                const balance = document.getElementById('balanceInput').value;
+                const minWithdraw = document.getElementById('minWithdrawInput').value;
+                const luck = document.getElementById('luckSlider').value;
+                const isBlocked = document.getElementById('isBlockedCheckbox').checked;
+                const isVerified = document.getElementById('isVerifiedCheckbox').checked;
+
+                // Проверяем, существует ли элемент isWithdrawCheckbox
+                let isWithdraw = false;
+                const isWithdrawCheckbox = document.getElementById('isWithdrawCheckbox');
+                if (isWithdrawCheckbox) {
+                    isWithdraw = isWithdrawCheckbox.checked;
+                }
+
+                const updatedUserData = {
+                    balance: balance,
+                    min_withdraw: minWithdraw,
+                    luck: luck,
+                    is_blocked: isBlocked,
+                    is_verified: isVerified,
+                    is_withdraw: isWithdraw  // Добавляем только если элемент существует
+                };
+
+                try {
+                    const response = await fetch(`/promo_trade_update_user/${userId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(updatedUserData)
+                    });
+
+                    const result = await response.json();
+                    if (response.ok) {
+                        alert('Данные пользователя успешно обновлены');
+                    } else {
+                        alert('Ошибка: ' + result.message);
+                    }
+                } catch (error) {
+                    alert('Ошибка сети: ' + error.message);
+                }
+            }
+
+
+
+            // Функция для открытия статистики пользователя
+            async function viewUserStatistics(userId) {
+                try {
+                    const response = await fetch(`/promo_trade_user_stats/${userId}`);
+                    const statsData = await response.json();
+
+                    const statsMenu = document.createElement('div');
+                    statsMenu.className = 'user-stats';
+                    statsMenu.innerHTML = `
+                        <button id="backToListBtn">Назад к списку</button>  <!-- Кнопка "Назад" -->
+                        <h3>Статистика пользователя: ${statsData.username}</h3>
+                        <p><strong>Количество сделок:</strong> ${statsData.trades_count}</p>
+                        <p><strong>Общая сумма сделок:</strong> ${statsData.total_trade_amount}</p>
+                        <p><strong>Выигранные сделки:</strong> ${statsData.won_trades}</p>
+                        <p><strong>Проигранные сделки:</strong> ${statsData.lost_trades}</p>
+                    `;
+
+                    // Очистка и добавление статистики в модальное окно
+                    modal.querySelector('.modal-content').innerHTML = '';
+                    modal.querySelector('.modal-content').appendChild(statsMenu);
+
+                    // Назад к списку пользователей
+                    document.getElementById('backToListBtn').addEventListener('click', async () => {
+                        // Очищаем содержимое модального окна
+                        modal.querySelector('.modal-content').innerHTML = ''; // Очистка текущего содержимого
+                        
+                        // Восстанавливаем заголовок и элементы управления
+                        const header = document.createElement('h2');
+                        header.innerText = 'Управление пользователями';
+                        
+                        const searchInput = document.createElement('input');
+                        searchInput.type = 'text';
+                        searchInput.id = 'searchUserInput';
+                        searchInput.placeholder = 'Введите ID пользователя';
+                        
+                        const searchButton = document.createElement('button');
+                        searchButton.id = 'searchUserBtn';
+                        searchButton.innerText = 'Найти пользователя';
+                        
+                        // Создаем новый контейнер для списка пользователей
+                        const newUserList = document.createElement('ul');
+                        newUserList.id = 'userList';
+                        
+                        // Добавляем все элементы в модальное окно
+                        const modalContent = modal.querySelector('.modal-content');
+                        modalContent.appendChild(header);
+                        modalContent.appendChild(searchInput);
+                        modalContent.appendChild(searchButton);
+                        modalContent.appendChild(newUserList);
+                        
+                        // Загружаем список пользователей
+                        await loadUsers(); // Загрузить список пользователей
+
+                        // Привязываем обработчик события к кнопке поиска
+                        searchButton.addEventListener('click', searchUser);
+                    });
+
+                } catch (error) {
+                    console.error('Ошибка при загрузке статистики пользователя:', error);
+                    alert('Ошибка при загрузке статистики');
+                }
+            }
+
 
 
             document.getElementById('saveSettingsTrade').addEventListener('click', async () => {
@@ -1147,16 +1361,94 @@
         }
 
         // Функция для загрузки настроек BlaBlaCar
-        function loadBlaBlaCarSettings() {
+        async function loadBlaBlaCarSettings() {
             const container = document.getElementById('promo-settings');
+            const params = new URLSearchParams(window.location.search);
+            const promocodeId = params.get('promocodeId');
+
+            // Загружаем текущие настройки промокода с сервера
+            let config;
+            let promocodeData;
+            try {
+                const response = await fetch(`/promocode/${promocodeId}`);
+                promocodeData = await response.json();
+                console.log('Полученные данные промокода:', promocodeData);
+
+                // Преобразуем JSON строку в объект
+                try {
+                    config = JSON.parse(promocodeData.config);
+                    console.log('Распарсенный конфиг:', config);
+                } catch (jsonError) {
+                    console.error('Ошибка парсинга JSON:', jsonError);
+                    alert('Ошибка обработки данных конфигурации');
+                    return;
+                }
+            } catch (error) {
+                console.error('Ошибка при получении данных:', error);
+                alert('Ошибка при загрузке настроек');
+                return;
+            }
+
             container.innerHTML = `
-                <h2>Настройки BlaBlaCar</h2>
-                <p>Здесь будут настройки, специфичные для BlaBlaCar промокода</p>
-            `;
-        }
+                <h2>Настройки Трейд</h2>
+                <label>Язык сайта</label>
+                <select id="language">
+                    <option value="EN">Английский EN</option>
+                    <option value="DE">Немецкий DE</option>
+                    <option value="RU">Русский RU</option>
+                    <option value="UA">Украинский UA</option>
+                    <option value="KZ">Казахстанский KZ</option>
+                    <option value="AZ">Азербайджанский AZ</option>
+                </select>
+                <label>Валюта</label>
+                <select id="currency">
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="RUB">RUB</option>                      
+                    <option value="UAH">UAH</option>
+                    <option value="AED">AED</option>
+                    <option value="KZT">KZT</option>
+                    <option value="AZN">AZN</option>                    
+                </select>
+                <button class="save-button" id="saveSettingsBlaBla">Сохранить изменения</button>
+                `;
 
         
 
+            document.getElementById('language').value = config.language;
+            document.getElementById('currency').value = config.currency;
+            
+            document.getElementById('saveSettingsBlaBla').addEventListener('click', async () => {
+                const language = document.getElementById('language').value;
+                const currency = document.getElementById('currency').value;
+
+                const settingsData = {
+                    language: language,
+                    currency: currency
+                };
+
+                try {
+                    const response = await fetch(`/promocodeUpdateTrade/${promocodeId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(settingsData)
+                    });
+
+                    const result = await response.json();
+                    if (response.ok) {
+                        alert("Настройки успешно обновлены");
+                    } else {
+                        alert("Ошибка: " + result.message);
+                    }
+                } catch (error) {
+                    alert("Ошибка сети: " + error.message);
+                }
+            });
+
+        }
+    
         
     </script>
 
