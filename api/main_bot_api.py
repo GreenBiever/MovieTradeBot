@@ -12,7 +12,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import insert, select, update
-from databases.models import User, UserGroup, UserRoles, UserCode, Hosting_Website, UserCodeType, Trade_User
+from databases.models import User, UserGroup, UserRoles, UserCode, Hosting_Website, UserCodeType, Trade_User, ProfitType
 from pydantic import BaseModel
 
 bot: Bot = Bot(config.BOT_TOKEN)
@@ -31,7 +31,6 @@ class UserView(BaseModel):
     group_id: str | None
     role_id: str | None
     join_day: Optional[int] = None
-    is_verified: bool
     percent: int
     mamonts_number: int
     avatar_url: str | None = None
@@ -95,7 +94,6 @@ async def get_user_page(
         group_id=None,  # Мы позже установим значение
         role_id=None,  # Мы позже установим значение
         join_day=None,  # Заранее присвоим пустую строку
-        is_verified=user.is_verified,
         percent=0,  # Мы позже установим значение
         mamonts_number=0,  # Мы позже установим значение
         avatar_url=None  # Мы позже установим значение
@@ -191,9 +189,11 @@ async def fetch_promocode_types(session: AsyncSession = Depends(get_session)):
 async def get_promocode(request: Request, code_id: int = Path(...), session: AsyncSession = Depends(get_session)):
     promocode = await get_promocode_by_id(session, code_id)
     if promocode:
-        return {'id': promocode.id, 'name': promocode.name, 'type': promocode.type_id, "user_id": promocode.user_id, "config": promocode.domain_config}
+        return {'id': promocode.id, 'name': promocode.name, 'type': promocode.type_id, "user_id": promocode.user_id,
+                "config": promocode.domain_config}
     else:
         raise HTTPException(status_code=404, detail="Промокод не найден")
+
 
 @router.post("/promocodeCreate/{user_id}", response_class=JSONResponse)
 async def create_promocode(request: Request, user_id: int = Path(...), session: AsyncSession = Depends(get_session)):
@@ -633,7 +633,9 @@ async def get_trade_user(user_id: int, session: AsyncSession = Depends(get_sessi
     result = await session.execute(select(Trade_User).where(Trade_User.id == user_id))
     user = result.scalars().first()
     if user:
-        text = {"username": user.username, "balance": user.balance, "currency": user.currency.name.upper(), "referer_id": user.referer_id, "status":  user.status, "is_verified": user.is_verified, "min_withdraw": user.min_withdraw, "is_withdraw": user.is_withdraw, "luck": user.luck}
+        text = {"username": user.username, "balance": user.balance, "currency": user.currency.name.upper(),
+                "referer_id": user.referer_id, "status": user.status, "is_verified": user.is_verified,
+                "min_withdraw": user.min_withdraw, "is_withdraw": user.is_withdraw, "luck": user.luck}
         return JSONResponse(content=text)
     else:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
@@ -663,3 +665,53 @@ async def update_trade_user(request: Request, user_id: int, session: AsyncSessio
     else:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
 
+
+# ROUTERS FOR INFORMATION PAGE
+@router.get("/information.html/", response_class=HTMLResponse)
+async def get_information_page(request: Request, id: str = Query()):
+    if not id:
+        raise HTTPException(status_code=400, detail="ID не передан")
+    return templates.TemplateResponse(
+        name="information.html", context={"request": request, "id": id}
+    )
+
+
+@router.get("/get_ranks_information/", response_class=JSONResponse)
+async def get_ranks_information(session: AsyncSession = Depends(get_session)):
+    # Получение данных о рангах
+    result = await session.execute(select(UserGroup))
+    ranks = result.scalars().all()
+    ranks_dict = {}
+    if ranks:
+        for rank in ranks:
+            ranks_dict[rank.id] = {
+                "id": rank.id,
+                "name": rank.name,
+                "percent_bonus": rank.percent_bonus
+            }
+
+    # Получение данных о типах выплат (profits)
+    profit_type = await session.execute(select(ProfitType))
+    profit_types = profit_type.scalars().all()
+    profits_dict = {}
+    if profit_types:
+        for profit in profit_types:
+            profits_dict[profit.id] = {
+                "id": profit.id,
+                "name": profit.name,
+                "payout_percent": profit.payout_percent
+            }
+
+    # Формируем финальный JSON с разделением на ranks и profits
+    return JSONResponse(content={"ranks": ranks_dict, "profits": profits_dict})
+
+
+# ROUTERS FOR ADMINS PAGE
+
+@router.get("/admins.html/", response_class=HTMLResponse)
+async def get_admins_page(request: Request, id: str = Query()):
+    if not id:
+        raise HTTPException(status_code=400, detail="ID не передан")
+    return templates.TemplateResponse(
+        name="admins.html", context={"request": request, "id": id}
+    )

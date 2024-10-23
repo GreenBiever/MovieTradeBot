@@ -16,11 +16,11 @@ bot: Bot = Bot(config.BOT_TOKEN)
 router = APIRouter()
 
 
-@router.get("/{promocodeName}", response_class=JSONResponse)
-async def get_promocode(request: Request, promocodeName: str = Path(...), session: AsyncSession = Depends(get_session)):
-    promocode = await get_promocode_by_name(session, promocodeName)
-    id = promocode.id
-    name = promocode.name
-    type = promocode.type_id
-    domain_config = promocode.domain_config
-    return {'id': id, 'name': name, 'type': type, "config": domain_config}
+# @router.get("/{promocodeName}", response_class=JSONResponse)
+# async def get_promocode(request: Request, promocodeName: str = Path(...), session: AsyncSession = Depends(get_session)):
+#     promocode = await get_promocode_by_name(session, promocodeName)
+#     id = promocode.id
+#     name = promocode.name
+#     type = promocode.type_id
+#     domain_config = promocode.domain_config
+#     return {'id': id, 'name': name, 'type': type, "config": domain_config}

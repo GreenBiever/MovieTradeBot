@@ -6,14 +6,12 @@ from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, Message, InputFile, MediaGroup, \
     InputMedia, InputMediaPhoto
-from aiogram.utils.exceptions import MessageCantBeDeleted
 
 import config
 from aiogram_toolbet.exceptions.menu import StopRender
 from aiogram_toolbet.menu.base import DynamicMenu
 from aiogram_toolbet.menu.meta import MenuHook
 from aiogram_toolbet.menu.state_var import StateVar
-from drawing.models.tortoise import DrawingCategoryAllowedUsers
 from drawing.payment_system import PaymentSystemNoteTemplate, PaymentSystemRefundSuccessTemplate, \
     PaymentSystemNonEquivalently, PaymentSystemTransactionRestricted, PaymentSystemUnknownError, \
     PaymentSystemCardNotSupported, PaymentSystemIncorrectOrderNumber
@@ -25,7 +23,8 @@ from drawing.worker_support import SupportMessageWithoutHashtagTemplate, Support
     SupportRefundTermsTemplate, SupportWithoutOrderNumberTemplate
 from misc.exception import ignore_handler_exception
 
-from databases.models import User, UserRoles
+from databases.models import User, DrawingCategoryAllowedUsers, DrawingCategory
+from users.role.default import UserRoles
 
 
 WAITING_TICKET_DATA = "DrawWizard:WAITING_TICKET_DATA"

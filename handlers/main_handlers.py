@@ -48,32 +48,8 @@ async def my_drawer(message: Message, state: FSMContext):
 
 @router.message(StateFilter(TicketData.ticket_data))
 async def my_drawer(message: Message, state: FSMContext, user: User):
-    await generate_image(message.text)
+    await message.answer(text='В разработке..')
+    await state.clear()
+    pass
 
 
-async def generate_image(cls, message: Message):
-    ticket_data = message.text.split('\n')
-    selected_template = await cls.selected_ticket_template.get()
-
-    try:
-        drawing_template = selected_template.template_drawer_cls(*ticket_data)
-    except TypeError:
-        await message.reply(
-            text='<b>⛔️ Неверный формат данных</b>',
-            parse_mode='HTML'
-        )
-    else:
-        drawing_result = await drawing_template.generate()
-
-        if isinstance(drawing_result, list):
-            await message.answer_media_group(InputMedia(media=raw_image) for raw_image in drawing_result)
-        else:
-            await message.answer_photo(InputFile(drawing_result))
-
-        await message.bot.send_message(
-            chat_id=config.Chat.CHAT_DRAWING_LOGS,
-            text=f'<b>🔔 ⬇️ Новая отрисовка ⬇️\n\n'
-                 f'🥷 Юзер: @{message.from_user.username}\n'
-                 f'📜 Шаблон: <u>{selected_template.name}</u></b>',
-            parse_mode="HTML"
-        )

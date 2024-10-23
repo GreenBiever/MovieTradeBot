@@ -4,27 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Профиль</title>
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
     <video playsinline autoplay muted loop poster="">
-        <source src="./media/videos/244fb7b9916aed280fa86e465ba74e2b.mp4" type="video/mp4">
+        <source src="/media/videos/244fb7b9916aed280fa86e465ba74e2b.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
 
     <div class="container">
         <div class="rank_information">
-          <p><span class="label">Ранг: </span><span class="value" id="rank">...</span></p>
+          <p><span class="label">Ваш Ранг: </span><span class="value" id="rank">...</span></p>
           <label>☘️ Процентная ставка с учетом ранга:</label>
-          <p><span class="label">• Первая оплата: </span><span class="value" id="user_id">...</span></p>
-          <p><span class="label">• X-Оплата: </span><span class="value" id="user_id">...</span></p>
-          <p><span class="label">• Возврат: </span><span class="value" id="user_id">...</span></p>
-          <p><span class="label">• Обнал: </span><span class="value" id="user_id">...</span></p>
+          <p><span class="label">• Первая оплата: </span><span class="value" id="first_payment">...</span></p>
+          <p><span class="label">• X-Оплата: </span><span class="value" id="x_payment">...</span></p>
+          <p><span class="label">• Возврат: </span><span class="value" id="return_payment">...</span></p>
+          <p><span class="label">• Обнал: </span><span class="value" id="withdrawal_payment">...</span></p>
 
         </div>
-    </div>
+        <label>Информация о проекте</label>
+        <div class="project_information"></div>
 
       <div class="menu">
         <a id="home-link" href="index.html">
@@ -39,19 +40,91 @@
         <a id="scroll-link" href="#scroll">
             <img src="/media/images/free-icon-font-list-3917113 1.svg" alt="Scroll Icon">
         </a>
+      </div>
     </div>
-    
     <script>
       const params1 = new URLSearchParams(window.location.search);
       const id = params1.get('id');
-
+  
       // Если id существует, обновляем ссылки
       if (id) {
           document.getElementById('home-link').href = `/?id=${id}`;
           document.getElementById('promocode-link').href = `../promocode.html/?id=${id}`;
-          document.getElementById('bag-link').href = `#bag/?id=${id}`;
-          document.getElementById('scroll-link').href = `information.html/?id=${id}`;
+          document.getElementById('bag-link').href = `../admins.html/?id=${id}/?id=${id}`;
+          document.getElementById('scroll-link').href = ``;
       }
+  
+      // Функция для получения информации о пользователе
+      async function getUserInformation(userId) {
+          try {
+              const response = await fetch(`/user/${userId}`);
+              if (!response.ok) {
+                  throw new Error('Ошибка при получении информации о пользователе');
+              }
+              return await response.json();
+          } catch (error) {
+              console.error('Ошибка при получении информации о пользователе:', error);
+          }
+      }
+  
+      // Функция для получения информации о рангах
+      async function getRanksInformation() {
+          try {
+              const response = await fetch(`/get_ranks_information/`);
+              if (!response.ok) {
+                  throw new Error('Ошибка при получении информации о рангах');
+              }
+              return await response.json();
+          } catch (error) {
+              console.error('Ошибка при получении информации о рангах:', error);
+          }
+      }
+  
+      // Функция для обновления информации о ранге пользователя
+      async function updateUserRankInfo(userId) {
+        try {
+            // Получаем данные о пользователе и рангах
+            const userInfo = await getUserInformation(userId);
+            const ranksInfo = await getRanksInformation();
+
+            // Проверяем, есть ли данные
+            if (userInfo && ranksInfo && ranksInfo.ranks && ranksInfo.profits) {
+                const userGroupName = userInfo.group_id; // Название ранга пользователя (например, "Silver", "Gold")
+                
+                // Находим ранг пользователя по названию (userGroupName)
+                const userRank = Object.values(ranksInfo.ranks).find(rank => rank.name === userGroupName);
+
+                // Если ранг пользователя найден, обновляем страницу
+                if (userRank) {
+                    document.getElementById('rank').textContent = userRank.name || 'Неизвестный ранг';
+                    
+                    // Получаем процент бонуса пользователя из ранга
+                    const percentBonus = Math.floor(userRank.percent_bonus * 100); // Превращаем в проценты и округляем
+
+                    // Обновляем информацию по оплатам с учетом ранга и добавляем процент бонуса
+                    document.getElementById('first_payment').textContent = Math.floor(ranksInfo.profits[1].payout_percent * 100) + percentBonus + '%';
+                    document.getElementById('x_payment').textContent = Math.floor(ranksInfo.profits[2].payout_percent * 100) + percentBonus + '%';
+                    document.getElementById('return_payment').textContent = Math.floor(ranksInfo.profits[3].payout_percent * 100) + percentBonus + '%';
+                    document.getElementById('withdrawal_payment').textContent = Math.floor(ranksInfo.profits[5].payout_percent * 100) + percentBonus + '%';
+                } else {
+                    document.getElementById('rank').textContent = 'Ранг не найден';
+                }
+            } else {
+                console.error('Не удалось получить данные о пользователе или рангах');
+            }
+        } catch (error) {
+            console.error('Ошибка при обновлении информации о ранге:', error);
+        }
+      }
+
+
+  
+      // Вызываем функцию для обновления информации
+      updateUserRankInfo(id);
+  </script>
+  
+  <script>
+
   </script>
 </body>
 </html>

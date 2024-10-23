@@ -651,3 +651,49 @@ input:checked + .slider {
 input:checked + .slider:before {
   transform: translateX(25px); /* перемещение ползунка вправо при активном тумблере */
 }
+
+/* СТИЛИ ДЛЯ INFORMATION.HTML */
+
+.rank_information {
+  background: linear-gradient(to right, #2D2D2D, #A10000);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 15px;
+  padding: 20px;
+  width: 100%;
+  max-width: 700px;
+}
+
+.rank_information .label {
+  font-weight: bold;
+}
+
+.rank_information label {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.project_information {
+  display: flex;
+  align-items: center; /* Вертикальное выравнивание */
+  flex-wrap: nowrap; /* Запрещаем перенос на новую строку */
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 20px;
+  width: 100%;
+  max-width: 700px;
+}
+
+/* СТИЛИ ДЛЯ ADMINS.HTML */
+
+.admins_information {
+  background: linear-gradient(to right, #2D2D2D, #A10000);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 15px;
+  padding: 20px;
+  width: 100%;
+  max-width: 700px;
+}
