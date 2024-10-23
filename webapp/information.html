@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <video playsinline autoplay muted loop poster="">
+        <source src="./media/videos/244fb7b9916aed280fa86e465ba74e2b.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <div class="container">
+        <div class="rank_information">
+          <p><span class="label">Ранг: </span><span class="value" id="rank">...</span></p>
+          <label>☘️ Процентная ставка с учетом ранга:</label>
+          <p><span class="label">• Первая оплата: </span><span class="value" id="user_id">...</span></p>
+          <p><span class="label">• X-Оплата: </span><span class="value" id="user_id">...</span></p>
+          <p><span class="label">• Возврат: </span><span class="value" id="user_id">...</span></p>
+          <p><span class="label">• Обнал: </span><span class="value" id="user_id">...</span></p>
+
+        </div>
+    </div>
+
+      <div class="menu">
+        <a id="home-link" href="index.html">
+            <img src="/media/images/free-icon-font-money-check-7928280 1.svg" alt="Promocode Icon">
+        </a>
+        <a id="promocode-link" href="">
+            <img src="/media/images/free-icon-font-shield-check-3917625 1.svg" alt="Security Icon">
+        </a>
+        <a id="bag-link" href="#bag">
+            <img src="/media/images/free-icon-font-briefcase-3916670 1.svg" alt="Bag Icon">
+        </a>
+        <a id="scroll-link" href="#scroll">
+            <img src="/media/images/free-icon-font-list-3917113 1.svg" alt="Scroll Icon">
+        </a>
+    </div>
+    
+    <script>
+      const params1 = new URLSearchParams(window.location.search);
+      const id = params1.get('id');
+
+      // Если id существует, обновляем ссылки
+      if (id) {
+          document.getElementById('home-link').href = `/?id=${id}`;
+          document.getElementById('promocode-link').href = `../promocode.html/?id=${id}`;
+          document.getElementById('bag-link').href = `#bag/?id=${id}`;
+          document.getElementById('scroll-link').href = `information.html/?id=${id}`;
+      }
+  </script>
+</body>
+</html>
