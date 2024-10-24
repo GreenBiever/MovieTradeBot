@@ -200,3 +200,83 @@ ERROR:asyncio:Unclosed client session
 client_session: <aiohttp.client.ClientSession object at 0x0000024781CA4290>
 ERROR:asyncio:Unclosed client session
 client_session: <aiohttp.client.ClientSession object at 0x0000024781DF90A0>
+INFO:aiogram.event:Update id=27486569 is handled. Duration 171 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000022507D9B560>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000022507FB1BB0>
+INFO:root:New user
+INFO:aiogram.event:Update id=27486570 is handled. Duration 187 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486571 is handled. Duration 108 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486572 is not handled. Duration 0 ms by bot id=8177988973
+INFO:root:New user
+INFO:aiogram.event:Update id=27486573 is handled. Duration 234 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486574 is handled. Duration 203 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486575 is handled. Duration 141 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486576 is handled. Duration 46 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486577 is handled. Duration 62 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486578 is handled. Duration 155 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486579 is handled. Duration 187 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486580 is handled. Duration 62 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486581 is handled. Duration 125 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486582 is not handled. Duration 16 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486583 is handled. Duration 62 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486584 is handled. Duration 125 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486585 is handled. Duration 94 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486586 is handled. Duration 94 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486587 is handled. Duration 46 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486588 is handled. Duration 125 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486589 is not handled. Duration 0 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486590 is handled. Duration 108 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486591 is handled. Duration 140 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001F9C912FA40>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001F9C9546630>
+INFO:aiogram.event:Update id=27486592 is handled. Duration 203 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486593 is handled. Duration 342 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486594 is not handled. Duration 31 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486595 is handled. Duration 94 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486596 is handled. Duration 110 ms by bot id=8177988973
+INFO:root:New user
+INFO:aiogram.event:Update id=27486597 is handled. Duration 187 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486598 is handled. Duration 155 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486599 is handled. Duration 62 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486600 is handled. Duration 46 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486601 is handled. Duration 46 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486602 is handled. Duration 46 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486603 is handled. Duration 203 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486604 is handled. Duration 140 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486605 is handled. Duration 78 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486606 is handled. Duration 110 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486607 is handled. Duration 156 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486608 is handled. Duration 108 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486609 is not handled. Duration 0 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486610 is handled. Duration 46 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486611 is handled. Duration 125 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486612 is not handled. Duration 0 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486613 is handled. Duration 109 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486614 is handled. Duration 46 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486615 is handled. Duration 78 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486616 is handled. Duration 94 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486617 is not handled. Duration 16 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486618 is handled. Duration 109 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486619 is handled. Duration 47 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486620 is handled. Duration 78 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486621 is handled. Duration 46 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486622 is handled. Duration 46 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486623 is handled. Duration 125 ms by bot id=8177988973
+INFO:aiogram.event:Update id=27486624 is handled. Duration 141 ms by bot id=8177988973
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001AEA2539940>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001AEA2D076E0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000022B9B5A3350>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000022B9D55A7E0>
+ERROR:asyncio:Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x0000022B9D6E2F90>, 271414.515)]']
+connector: <aiohttp.connector.TCPConnector object at 0x0000022B9D5962D0>
+ERROR:asyncio:Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000022B9D44C410>

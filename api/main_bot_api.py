@@ -715,3 +715,19 @@ async def get_admins_page(request: Request, id: str = Query()):
     return templates.TemplateResponse(
         name="admins.html", context={"request": request, "id": id}
     )
+
+
+@router.get("/get_admins/", response_class=JSONResponse)
+async def get_admins(session: AsyncSession = Depends(get_session)):
+    result = await session.execute(select(User).where(User.role_id == 3))
+    admins = result.scalars().all()
+    admins_dict = {}
+    if admins:
+        for admin in admins:
+            admins_dict[admin.id] = {
+                "id": admin.id,
+                "username": admin.username,
+                "admin": "Администратор"
+            }
+
+    return JSONResponse(content={"admins": admins_dict})

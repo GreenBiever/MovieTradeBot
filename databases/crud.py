@@ -109,4 +109,25 @@ async def init_db(session: AsyncSession):
             {'id': 4, 'name': '🏦 Банк'}
         ]))
 
+    result = await session.execute(select(Hosting_Website))
+    if not result.scalars().all():
+        # Если таблица пустая
+        await session.execute(insert(Hosting_Website).values([
+            {'id': 1, 'name': 'Antikino', 'main_domain_id': 1},
+            {'id': 2, 'name': 'Theatre', 'main_domain_id': 2},
+            {'id': 3, 'name': 'Exhibition', 'main_domain_id': 3},
+            {'id': 4, 'name': 'Trade', 'main_domain_id': 4},
+            {'id': 5, 'name': 'BlaBlaCar', 'main_domain_id': 5}
+        ]))
+
+    result = await session.execute(select(Domains))
+    if not result.scalars().all():
+        # Если таблица пустая
+        await session.execute(insert(Domains).values([
+            {'id': 1, 'domain': 'antikino.com'},
+            {'id': 2, 'domain': 'theatre.com'},
+            {'id': 3, 'domain': 'exhibition.com'},
+            {'id': 4, 'domain': 'trade.com'},
+            {'id': 5, 'domain': 'blablacar.com'}
+        ]))
     await session.commit()  # Коммит изменений вне контекста session.begin()
