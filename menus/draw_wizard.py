@@ -8,10 +8,9 @@ from aiogram.fsm.state import StatesGroup, State
 
 from app_dependency import dp as Dispatcher
 from aiogram.fsm.context import FSMContext
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, Message, InputFile, \
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, Message, \
     InputMediaPhoto, FSInputFile, BufferedInputFile
 from sqlalchemy.ext.asyncio import AsyncSession
-import config
 from aiogram_toolbet.exceptions.menu import StopRender
 from aiogram_toolbet.menu.base import DynamicMenu
 from aiogram_toolbet.menu.meta import MenuHook
@@ -523,8 +522,10 @@ class DrawWizardMenu(DynamicMenu):
             return
 
         try:
-            drawing_template: Type[TicketTemplateT] = selected_template.template_drawer_cls(*ticket_data)
-        except TypeError:
+            drawing_template: Type[TicketTemplateT] = selected_template.template_drawer_cls(*ticket_data, session)
+            print(drawing_template)
+        except TypeError as e:
+            print(e)
             await message.reply(
                 text='<b>⛔️ Неверный формат данных</b>',
                 parse_mode='HTML'
@@ -545,7 +546,7 @@ class DrawWizardMenu(DynamicMenu):
                 await message.answer_photo(buffered_file, caption='Here is your drawing!')
             else:
                 # Обрабатываем случай, когда drawing_result ожидается как путь к файлу или URL
-                await message.answer_photo(BufferedInputFile(drawing_result), caption='Here is your drawing!')
+                await message.answer_photo(BufferedInputFile(drawing_result.read(), filename='drawing.png'), caption='Here is your drawing!')
 
         except Exception as e:
             logging.error(f"Error generating image: {e}")

@@ -2,6 +2,8 @@ from io import BytesIO
 from random import randint
 
 from PIL import ImageFont
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from drawing.base import DrawingTemplate
 
 
@@ -13,7 +15,7 @@ class TheatreTicket(DrawingTemplate):
         date = (395, 221)
         order_number = (152, 414)
 
-    def __init__(self, event_name: str, price: str, seat: str, date: str):
+    def __init__(self, event_name: str, price: str, seat: str, date: str, session: AsyncSession):
         super().__init__('assets/img/theatre_ticket_template_new.png')
         self.event = event_name
         self.price = price
@@ -52,7 +54,7 @@ class CinemaTicket(DrawingTemplate):
         price = (463, 586)
         date = (410, 616)
 
-    def __init__(self, room_name: str, price: str, date: str):
+    def __init__(self, room_name: str, price: str, date: str, session: AsyncSession):
         super().__init__('assets/img/cinema_ticket_template.png')
         self.room_name = room_name
         self.price = price
@@ -80,7 +82,7 @@ class ExhibitionTicket(DrawingTemplate):
         price = (313, 808)
         date = (607, 806)
 
-    def __init__(self, event_name: str, price: str, date: str, time: str):
+    def __init__(self, event_name: str, price: str, date: str, time: str, session: AsyncSession):
         super().__init__('assets/img/exhibitions_ticket_template.png')
         self.event_name = event_name
         self.price = price
@@ -109,7 +111,7 @@ class StandupTicket(DrawingTemplate):
         price = (321, 484)
         date = (224, 644)
 
-    def __init__(self, event_name: str, price: str, date: str, time: str):
+    def __init__(self, event_name: str, price: str, date: str, time: str, session: AsyncSession):
         super().__init__('assets/img/standup_ticket_template.png')
         self.event_name = event_name
         self.price = price

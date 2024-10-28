@@ -1,6 +1,8 @@
 from io import BytesIO
 from random import randint
 from PIL import ImageFont
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from drawing.base import DrawingTemplate
 
 
@@ -14,7 +16,7 @@ class DefaultGuaranteeLetterTemplate(DrawingTemplate):
         amount = (205, 246)
         site = (60, 246 + 18 + 18)
 
-    def __init__(self, date: str, year: str, first_name: str, last_name: str, amount: str, site: str):
+    def __init__(self, date: str, year: str, first_name: str, last_name: str, amount: str, site: str, session: AsyncSession):
         super().__init__('assets/img/support/guarantee_letter_default.jpg')
         self.date = date
         self.year = year
@@ -22,6 +24,7 @@ class DefaultGuaranteeLetterTemplate(DrawingTemplate):
         self.last_name = last_name
         self.amount = amount
         self.site = site
+        self.session = session
 
         self.color = '#000000'
 
@@ -52,12 +55,13 @@ class CbGuaranteeLetterTemplate(DrawingTemplate):
         name = (378, 326)
         amount = (570, 326)
 
-    def __init__(self, date: str, year: str, name: str,  amount: str):
+    def __init__(self, date: str, year: str, name: str,  amount: str, session: AsyncSession):
         super().__init__('assets/img/support/guarantee_letter_cb.jpg')
         self.date = date
         self.year = year
         self.name = name
         self.amount = amount
+        self.session = session
 
         self.color = (59, 59, 57)
 
@@ -85,11 +89,12 @@ class RefundStatusTemplate(DrawingTemplate):
         reason = (125, 192)
         operation_num = (125, 20)
 
-    def __init__(self, date: str, name: str, reason: str):
+    def __init__(self, date: str, name: str, reason: str, session: AsyncSession):
         super().__init__('assets/img/support/refund_status.jpg')
         self.date = date
         self.name = name
         self.reason = reason
+        self.session = session
 
         self.color = '#000000'
 
