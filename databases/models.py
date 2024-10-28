@@ -1,10 +1,10 @@
-from sqlalchemy import BigInteger, ForeignKey, String, Text, Boolean, Float, Select
+from sqlalchemy import BigInteger, ForeignKey, String, Text, Boolean, Float, Select, select
 from sqlalchemy.orm import relationship, Mapped, mapped_column, DeclarativeBase
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
 from utils.get_exchange_rate import currency_exchange
 from .enums import CurrencyEnum
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 from .connect import Base
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import update, Table, Column, Integer
@@ -32,9 +32,16 @@ class User(Base):
     group_id: Mapped[int | None] = mapped_column(ForeignKey('usergroup.id'))
     role_id: Mapped[int | None] = mapped_column(ForeignKey('userroles.id'))
     referer_id: Mapped[Optional['User']] = mapped_column(ForeignKey('users.id'))
+    # Связь с Рефералами
     referals: Mapped[list['User']] = relationship('User', back_populates='referer')
     referer: Mapped[Optional['User']] = relationship('User', back_populates='referals', remote_side=[id])
     categories = relationship('DrawingCategory', secondary='drawing_category_allowed_users', back_populates='users')
+    # Связь с TrafficSource
+    traffic_source_id: Mapped[Optional[int]] = mapped_column(ForeignKey('traffic_source.id'))
+    traffic_source: Mapped[Optional['TrafficSource']] = relationship('TrafficSource', back_populates='referred_users')
+    # Связь с UserCode
+    codes: Mapped[list['UserCode']] = relationship('UserCode', back_populates='user')
+    role: Mapped[Optional['UserRoles']] = relationship("UserRoles", back_populates="users")
 
     async def get_balance(self) -> float:
         '''Return user balance converted to user currency'''
@@ -76,6 +83,15 @@ class User(Base):
             return f"@{self.username}"
 
 
+class TrafficSource(Base):
+    __tablename__ = "traffic_source"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
+    description: Mapped[str] = mapped_column(String(1024), nullable=True, default=None)
+    referred_users: Mapped[List[User]] = relationship("User", back_populates='traffic_source')
+
+
 class UserGroup(Base):
     __tablename__ = "usergroup"
 
@@ -91,6 +107,33 @@ class UserRoles(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
 
+    users = relationship("User", back_populates="role")  # Связь с пользователями
+
+    @classmethod
+    async def get_all(cls, session: AsyncSession):
+        result = await session.execute(select(cls))
+        return result.scalars().all()
+
+    @classmethod
+    async def get_by_id(cls, session: AsyncSession, id: int):
+        result = await session.execute(
+            select(cls).filter(cls.id == id)
+        )
+        return result.scalar_one_or_none()
+
+    @classmethod
+    async def assign_to_user(cls, session: AsyncSession, user_id: int, role_id: int):
+        user = await session.get(User, user_id)
+        if user:
+            user.role_id = role_id
+            await session.commit()  # Сохраняем изменения
+            return True
+        return False
+
+    async def set_name(self, session: AsyncSession, new_name: str):
+        self.name = new_name
+        await session.commit()  # Сохраняем изменения
+
 
 class UserCode(Base):
     __tablename__ = "usercode"
@@ -100,6 +143,9 @@ class UserCode(Base):
     type_id: Mapped[str] = mapped_column(ForeignKey('usercodetype.id'))
     user_id: Mapped[int] = mapped_column(ForeignKey('users.tg_id'))
     domain_config: Mapped[str] = mapped_column(Text, nullable=True)
+
+    # Связь с User
+    user: Mapped['User'] = relationship('User', back_populates='codes')
 
 
 class UserCodeType(Base):
@@ -194,3 +240,14 @@ class DrawingCategoryAllowedUsers(Base):
 
     category_id: Mapped[int] = mapped_column(ForeignKey('drawing_category.id'), nullable=False, primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey('users.tg_id'), nullable=False, primary_key=True)
+
+    @classmethod
+    async def exists(cls, category_id: int, user_id: int, session: AsyncSession) -> bool:
+        """Check if a user is allowed in a specific drawing category."""
+        result = await session.execute(
+            select(cls).where(
+                cls.category_id == category_id,
+                cls.user_id == user_id
+            )
+        )
+        return result.scalar() is not None  # Returns True if a record exists, otherwise False

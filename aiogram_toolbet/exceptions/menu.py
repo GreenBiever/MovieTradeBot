@@ -1,0 +1,4 @@
+
+
+class StopRender(BaseException):
+    pass

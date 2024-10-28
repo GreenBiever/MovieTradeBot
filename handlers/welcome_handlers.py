@@ -1,10 +1,9 @@
 from aiogram.filters import StateFilter, Command
 from aiogram import F, Router
 from aiogram.fsm.state import StatesGroup, State
-
 import config
-from aiogram.types import Message
-from aiogram import types, exceptions, Bot
+from aiogram.types import Message, FSInputFile
+from aiogram import types, exceptions
 from keyboards import keyboard as kb
 from databases.models import User
 from middlewares.user_middlware import AuthorizeMiddleware
@@ -12,11 +11,12 @@ from databases.crud import init_db
 from aiogram.fsm.context import FSMContext
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import update, select
-
+from main import bot as Bot
 router = Router()
 router.message.middleware(AuthorizeMiddleware())
 router.callback_query.middleware(AuthorizeMiddleware())
 
+bot = Bot
 
 class SendApplication(StatesGroup):
     first_question = State()
@@ -32,87 +32,91 @@ async def get_greeting(message: Message, user: User, edited_message: Message | N
         await message.answer('Ожидайте рассмотрения вашей заявки')
         return
     if user.status == 2:
-        await message.answer(text=f'<b>👋 Добро пожаловать, {user.username}!\n выберите сервис ниже:</b>',
-                             parse_mode="HTML", reply_markup=kb.main)
+        await bot.send_animation(message.from_user.id, animation=FSInputFile(config.Gifs.welcome_gif),
+                                 caption=f'<b>👋 Добро пожаловать, {user.username}!\n выберите сервис ниже:</b>',
+                                 parse_mode="HTML", reply_markup=kb.main)
         if user.tg_id in config.ADMIN_IDS or user.role_id == 3:
-            await message.answer(text=f'<b>👋 Добро пожаловать администратор, {user.username}!\n выберите сервис ниже:</b>',
-                                 parse_mode="HTML", reply_markup=kb.main_admin)
+            await message.answer(
+                text=f'<b>👋 Добро пожаловать администратор, {user.username}!\n выберите сервис ниже:</b>',
+                parse_mode="HTML", reply_markup=kb.main_admin)
     else:
-        await message.answer(text=f'<b>👋Добро пожаловать, {user.username}!\n\
+        anmiation = FSInputFile(config.Gifs.welcome_gif)
+        await bot.send_animation(message.from_user.id, animation=anmiation,
+                                 caption=f'<b>👋Добро пожаловать, {user.username}!\n\
     Подай заявку чтобы присоединиться к 💎Diamond Team💎</b>',
-                             parse_mode="HTML", reply_markup=kb.apply)
+                                 parse_mode="HTML", reply_markup=kb.apply)
 
 
 @router.message(Command('start'))
 async def cmd_start(message: Message, bot: Bot, user: User, session: AsyncSession):
-    await init_db(session)
+    # await init_db(session)
     await get_greeting(message, user)
 
 
 @router.callback_query(F.data == 'apply')
 async def application_start(cb: types.CallbackQuery,
                             state: FSMContext):
-    await cb.message.answer(text='<b>Твоя заявка: Не заполнена\n\n'
-                                 '1. ---\n'
-                                 '2. ---\n'
-                                 '3. ---\n\n'
-                                 '🕵️ Откуда вы о нас узнали?</b>', parse_mode='HTML')
+    await bot.send_animation(cb.from_user.id, animation=FSInputFile(config.Gifs.welcome_gif),
+                             caption='<b>📝 Твоя заявка: Не заполнена\n\n'
+                                     '1. ---\n'
+                                     '2. ---\n'
+                                     '3. ---\n\n'
+                                     '🕵️ Откуда вы о нас узнали?</b>', parse_mode='HTML')
     await cb.answer()
     await state.set_state(SendApplication.first_question)
 
 
 @router.message(StateFilter(SendApplication.first_question))
 async def application_fist(message: Message,
-                           state: FSMContext,
-                           bot: Bot):
+                           state: FSMContext):
     answer = message.text
     await state.update_data(first_question=answer)
-    await bot.send_message(message.from_user.id, text='<b>Твоя заявка: Не заполнена\n\n'
-                                                      f'1. {answer}\n'
-                                                      '2. ---\n'
-                                                      '3. ---\n\n'
-                                                      '🧠 Есть ли опыт работы? Если да то какой?</b>', parse_mode='HTML')
+    await bot.send_animation(message.from_user.id, animation=FSInputFile('assets/gifs/Xmqj.gif'),
+                             caption='<b>📝 Твоя заявка: Не заполнена\n\n'
+                                     f'1. {answer}\n'
+                                     '2. ---\n'
+                                     '3. ---\n\n'
+                                     '🧠 Есть ли опыт работы? Если да то какой?</b>', parse_mode='HTML')
     await state.set_state(SendApplication.second_question)
 
 
 @router.message(StateFilter(SendApplication.second_question))
 async def application_second(message: Message,
-                             state: FSMContext,
-                             bot: Bot):
+                             state: FSMContext):
     answer = message.text
     state_info = await state.get_data()
     first_answer = state_info.get('first_question')
     await state.update_data(second_question=answer)
-    await bot.send_message(message.from_user.id, text='<b>Твоя заявка: Не заполнена\n\n'
-                                                      f'1. {first_answer}\n'
-                                                      f'2. {answer}\n'
-                                                      '3. ---\n\n'
-                                                      '🧑‍💻 Сколько времени готовы уделять работе?</b>',
-                           parse_mode='HTML')
+    await bot.send_animation(message.from_user.id, animation=FSInputFile(config.Gifs.welcome_gif),
+                             caption='<b>📝 Твоя заявка: Не заполнена\n\n'
+                                     f'1. {first_answer}\n'
+                                     f'2. {answer}\n'
+                                     '3. ---\n\n'
+                                     '🧑‍💻 Сколько времени готовы уделять работе?</b>',
+                             parse_mode='HTML')
     await state.set_state(SendApplication.third_question)
 
 
 @router.message(StateFilter(SendApplication.third_question))
 async def application_third(message: Message,
-                            state: FSMContext,
-                            bot: Bot):
+                            state: FSMContext):
     answer = message.text
     await state.update_data(third_question=answer)
     state_info = await state.get_data()
     first_answer = state_info.get('first_question')
     second_answer = state_info.get('second_question')
-    await bot.send_message(message.from_user.id, text='<b>Твоя заявка: Заполнена\n\n'
-                                                      f'1. {first_answer}\n'
-                                                      f'2. {second_answer}\n'
-                                                      f'3. {answer}\n\n'
-                                                      '🧑Отправить?</b>', parse_mode='HTML',
-                           reply_markup=kb.application_send)
+    await bot.send_animation(message.from_user.id, animation=FSInputFile('assets/gifs/Xmqj.gif'),
+                             caption='<b>📝 Твоя заявка: Заполнена\n\n'
+                                     f'1. {first_answer}\n'
+                                     f'2. {second_answer}\n'
+                                     f'3. {answer}\n\n'
+                                     '🧑Отправить?</b>', parse_mode='HTML',
+                             reply_markup=kb.application_send)
 
 
 @router.callback_query(lambda call: call.data in ['send_application', 'again'])
 async def application_send(call: types.CallbackQuery,
-                           state: FSMContext,
-                           bot: Bot, user: User, session: AsyncSession):
+                           state: FSMContext, user: User, session: AsyncSession):
     if call.data == 'send_application':
         state_info = await state.get_data()
         first_answer = state_info.get('first_question')
@@ -150,7 +154,7 @@ async def application_send(call: types.CallbackQuery,
 
 
 @router.callback_query(F.data.startswith('request_'))
-async def admin_application(call: types, user: User, bot: Bot, session: AsyncSession):
+async def admin_application(call: types, user: User, session: AsyncSession):
     _, status, user_tg_id = call.data.split('_')
     if status == 'accept':
         await bot.send_message(user_tg_id, text='✅ Ваша заявка принята\n\n', reply_markup=kb.main)

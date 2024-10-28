@@ -1,14 +1,26 @@
 from io import BytesIO
 from PIL import ImageFont, Image
-
-from hosting.websites.all import PaymentSystem
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from databases.models import Hosting_Website, Domains
 from .base import DrawingTemplate, Coordinates2D
 
 
 class PaymentSystemDrawingTemplate(DrawingTemplate):
 
     async def _load_autocomplete_values(self):
-        self.website_domain = f'{await PaymentSystem.get_current_domain_name()}'
+        async with AsyncSession() as session:
+            result = await session.execute(
+                select(Domains.domain)
+                .join(Hosting_Website, Domains.id == Hosting_Website.main_domain_id)
+                .where(Hosting_Website.name == "Оплата")
+            )
+            domain_name = result.scalar_one_or_none()
+            print(domain_name)
+            if domain_name is None:
+                raise ValueError("Domain not found")
+            self.website_domain = f'{domain_name}'
+
 
     def _init_fonts(self):
         self._font_iphone_time = ImageFont.truetype('assets/fonts/iphone_time.ttf')
@@ -74,21 +86,21 @@ class PaymentSystemRefundSuccessTemplate(PaymentSystemDrawingTemplate):
     #     super()._init_assets()
     #     self._lock_icon = Image.open('assets/img/icons/lock.png')
 
-    def _generate(self) -> BytesIO:
-        self._drawer.text(self.TextCoordinates.time, self.time, font=self._font_iphone_time.font_variant(size=45), fill='#000000')
-        ws_domain_x_coord = self.TextCoordinates.website_domain.x(self.website_domain)
-        self._drawer.text(
-            (ws_domain_x_coord, self.TextCoordinates.website_domain.y),
-            self.website_domain,
-            font=self._font_cario_semibold.font_variant(size=52),
-            fill='#E5E5E5'
-        )
-
-        buffer = BytesIO()
-        self._image.save(buffer, format='PNG')
-        buffer.seek(0)
-
-        return buffer
+    # def _generate(self) -> BytesIO:
+    #     self._drawer.text(self.TextCoordinates.time, self.time, font=self._font_iphone_time.font_variant(size=45), fill='#000000')
+    #     ws_domain_x_coord = self.TextCoordinates.website_domain.x(self.website_domain)
+    #     self._drawer.text(
+    #         (ws_domain_x_coord, self.TextCoordinates.website_domain.y),
+    #         self.website_domain,
+    #         font=self._font_cario_semibold.font_variant(size=52),
+    #         fill='#E5E5E5'
+    #     )
+    #
+    #     buffer = BytesIO()
+    #     self._image.save(buffer, format='PNG')
+    #     buffer.seek(0)
+    #     print(buffer)
+    #     return buffer
 
 
 class PaymentSystemNonEquivalently(PaymentSystemDrawingTemplate):

@@ -1,33 +1,41 @@
 import abc
+import logging
 from dataclasses import dataclass
 from typing import Type
+import io
 
-from aiogram import Dispatcher
+from aiogram.fsm.state import StatesGroup, State
+
+from app_dependency import dp as Dispatcher
 from aiogram.fsm.context import FSMContext
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, Message, InputFile, MediaGroup, \
-    InputMedia, InputMediaPhoto
-
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, Message, InputFile, \
+    InputMediaPhoto, FSInputFile, BufferedInputFile
+from sqlalchemy.ext.asyncio import AsyncSession
 import config
 from aiogram_toolbet.exceptions.menu import StopRender
 from aiogram_toolbet.menu.base import DynamicMenu
 from aiogram_toolbet.menu.meta import MenuHook
 from aiogram_toolbet.menu.state_var import StateVar
-from drawing.payment_system import PaymentSystemNoteTemplate, PaymentSystemRefundSuccessTemplate, \
+from databases.models import DrawingCategoryAllowedUsers
+from drawing.base import TicketTemplateT
+from drawing.payment_system import PaymentSystemRefundSuccessTemplate, \
     PaymentSystemNonEquivalently, PaymentSystemTransactionRestricted, PaymentSystemUnknownError, \
     PaymentSystemCardNotSupported, PaymentSystemIncorrectOrderNumber
 from drawing.support_scripts import DefaultGuaranteeLetterTemplate, CbGuaranteeLetterTemplate, RefundStatusTemplate
 from drawing.ticket_generator import CinemaTicket, TheatreTicket, ExhibitionTicket, StandupTicket
-from drawing.base import TicketTemplateT
 from drawing.tinkoff import TinkoffIncomePaymentTemplate, TinkoffOutgoingPaymentTemplate
 from drawing.worker_support import SupportMessageWithoutHashtagTemplate, SupportMessageWithRedundantHashtagTemplate, \
     SupportRefundTermsTemplate, SupportWithoutOrderNumberTemplate
-from misc.exception import ignore_handler_exception
-
-from databases.models import User, DrawingCategoryAllowedUsers, DrawingCategory
 from users.role.default import UserRoles
-
+from users.role.role import UserRole
+from users.user import User
 
 WAITING_TICKET_DATA = "DrawWizard:WAITING_TICKET_DATA"
+
+
+class TemplateState(StatesGroup):
+    key = State()
+    valute = State()
 
 
 @dataclass
@@ -52,8 +60,8 @@ class DrawingTemplateRestrictedByRole(DrawingTemplateWithRestrictedAccess):
     """
     role_id_list: list[int] | str = '*'
 
-    async def check_access(self, user: User, **context) -> bool:
-        user_role = await user.role_id
+    async def check_access(self, session: AsyncSession, user: User, **context) -> bool:
+        user_role: UserRole = await user.get_role(session)
         if type(self.role_id_list) == str and self.role_id_list == '*':
             return True
 
@@ -77,21 +85,24 @@ class TemplateCategoryWithRestrictedAccess(TemplateCategory):
 @dataclass
 class TemplateCategoryRestrictedByUserID(TemplateCategoryWithRestrictedAccess):
 
-    async def check_access(self, user: User, **context) -> bool:
-        res = await DrawingCategoryAllowedUsers.exists(category_id=self.id, user_id=user.id)
+    async def check_access(self, user: User, session: AsyncSession, **context) -> bool:
+        res = await DrawingCategoryAllowedUsers.exists(
+            category_id=self.id,
+            user_id=user.id,
+            session=session
+        )
         return res
 
 
 @dataclass
 class TemplateCategoryRestrictedByRole(TemplateCategoryWithRestrictedAccess):
-
     """
     Use a star notation instead list to match any role
     """
     role_id_list: list[int] | str = '*'
 
-    async def check_access(self, user: User, **context) -> bool:
-        user_role = await user.role_id
+    async def check_access(self, session: AsyncSession, user: User, **context) -> bool:
+        user_role: UserRole = await user.get_role(session)
         if type(self.role_id_list) == str and self.role_id_list == '*':
             return True
 
@@ -400,38 +411,47 @@ class DrawWizardMenu(DynamicMenu):
     }
 
     @classmethod
-    async def _get_keyboard(cls, user: User, **kwargs):
+    async def _get_keyboard(cls, user: User, session: AsyncSession, **kwargs):
         available_categories_for_user = {
             category_name: category
             for category_name, category in cls.categories.items()
-            if await category.check_access(user=user)
+            if await category.check_access(user=user, session=session)
         }
 
-        return InlineKeyboardMarkup(
+        keyboard_markup = InlineKeyboardMarkup(
             inline_keyboard=[[
-                    InlineKeyboardButton(category.name, callback_data=cls._generate_callback('open_cat', category_name))
-                ]
+                InlineKeyboardButton(text=category.name,
+                                     callback_data=cls._generate_callback('open_cat', category_name))
+            ]
                 for category_name, category in available_categories_for_user.items()
             ],
             row_width=1
         )
+        return keyboard_markup
 
     @classmethod
-    async def open_category(cls, call: CallbackQuery, state: FSMContext, **kwargs):
+    async def open_category(cls, call: CallbackQuery, state: FSMContext, session: AsyncSession, **kwargs):
         if 'category' in kwargs:
             category_name = kwargs.pop('category')
         else:
             _, _, category_name = call.data.split(':', maxsplit=2)
 
         current_category = cls.categories.get(category_name)
+
+        if not current_category:
+            await call.message.answer("Категория не найдена.")
+            return
+
+        # Создаем клавиатуру, добавляя кнопки для каждого шаблона
         keyboard = InlineKeyboardMarkup(
             inline_keyboard=[
-                [InlineKeyboardButton(template.name, callback_data=cls._generate_callback('set_tpl', category_name, template_id))]
-                for template_id, template in current_category.templates.items()
-            ]
+                                [InlineKeyboardButton(text=template.name,
+                                                      callback_data=cls._generate_callback('set_tpl', category_name,
+                                                                                           template_id))]
+                                for template_id, template in current_category.templates.items()
+                            ] + [[InlineKeyboardButton(text='🔙 Назад', callback_data='goto:DrawWizardMenu')]]
+            # Кнопка "Назад"
         )
-        keyboard.add(InlineKeyboardButton('🔙 Назад', callback_data='goto:DrawWizardMenu'))
-
         await call.message.answer(
             text='*🎨 Выбери шаблон*',
             reply_markup=keyboard,
@@ -440,49 +460,68 @@ class DrawWizardMenu(DynamicMenu):
         await call.message.delete()
 
     @classmethod
-    @ignore_handler_exception(MessageCantBeDeleted)
-    async def set_template(cls, call: CallbackQuery, state: FSMContext, **kwargs):
+    async def set_template(cls, call: CallbackQuery, state: FSMContext, session: AsyncSession, **kwargs):
+        # Извлечение имени категории и шаблона из данных обратного вызова
         _, _, category_name, template_name = call.data.split(':', maxsplit=3)
         current_category = cls.categories.get(category_name)
         current_template = current_category.templates.get(template_name)
-        await cls.selected_ticket_template.set(current_template)
+
+        # Установка состояния
+        await state.set_state(TemplateState.key)
         await state.set_state(WAITING_TICKET_DATA)
 
+        # Сохранение выбранного шаблона в состоянии
+        await state.update_data(selected_ticket_template=current_template)  # Сохраняем шаблон
+
         backward_keyboard = InlineKeyboardMarkup(
-            inline_keyboard=[[
-                InlineKeyboardButton('🔙 Назад', callback_data=f'goto:DrawWizardMenu:category={current_category.name}')
-            ]]
+            inline_keyboard=[[InlineKeyboardButton(text='🔙 Назад',
+                                                   callback_data=f'goto:DrawWizardMenu:category={current_category.name}')]]
         )
 
-        if current_template.preview_images is not None:
-            handler = call.message.answer_media_group(
-                MediaGroup([
+        # Отправка пользователю выбранного шаблона
+        if current_template.preview_images:
+            if len(current_template.preview_images) > 1:
+                media = [
                     InputMediaPhoto(
-                        media=InputFile(img_path),
+                        media=img_path,
                         caption=current_template.description if img_id == 0 else None,
                         parse_mode='MARKDOWNV2'
                     )
                     for img_id, img_path in enumerate(current_template.preview_images)
-                ])
-            ) if len(current_template.preview_images) > 1 else call.message.answer_photo(
-                photo=InputFile(current_template.preview_images[0]),
-                reply_markup=backward_keyboard,
-                parse_mode=cls.parse_mode,
-                caption=current_template.description
-            )
-            await handler
+                ]
+                await call.message.answer_media_group(media)
+            else:
+                await call.message.answer_photo(
+                    photo=FSInputFile(current_template.preview_images[0]),
+                    reply_markup=backward_keyboard,
+                    parse_mode='MARKDOWNV2',
+                    caption=current_template.description
+                )
             await call.message.delete()
         else:
             await call.message.edit_text(
                 text=current_template.description,
-                parse_mode=cls.parse_mode,
+                parse_mode='MARKDOWNV2',
                 reply_markup=backward_keyboard
             )
 
     @classmethod
-    async def generate_image(cls, message: Message, state: FSMContext, **kwargs):
+    async def generate_image(cls, message: Message, state: FSMContext, session: AsyncSession, **kwargs):
         ticket_data = message.text.split('\n')
-        selected_template = await cls.selected_ticket_template.get()
+        data = await state.get_data()
+        selected_template = data.get('selected_ticket_template')
+
+        if not selected_template or selected_template == 'не выбран':
+            await message.reply(text='<b>⛔️ Шаблон не выбран</b>', parse_mode='HTML')
+            return
+
+        if not isinstance(selected_template, DrawingTemplate):
+            await message.reply(
+                text='<b>⛔️ Пожалуйста, выберите корректный шаблон</b>',
+                parse_mode='HTML'
+            )
+            return
+
         try:
             drawing_template: Type[TicketTemplateT] = selected_template.template_drawer_cls(*ticket_data)
         except TypeError:
@@ -490,26 +529,29 @@ class DrawWizardMenu(DynamicMenu):
                 text='<b>⛔️ Неверный формат данных</b>',
                 parse_mode='HTML'
             )
-        else:
-            drawing_result = await drawing_template.generate()
-            if type(drawing_result) == list:
-                await message.answer_media_group(MediaGroup([
-                    InputMedia(media=raw_image)
-                    for raw_image in drawing_result
-                ]))
+            return
+
+        try:
+            drawing_result = await drawing_template.generate()  # Это должно возвращать объект BytesIO
+            logging.info(f"drawing_result type: {type(drawing_result)}")  # Проверяем тип
+
+            if isinstance(drawing_result, list):
+                media = [InputMediaPhoto(media=raw_image) for raw_image in drawing_result]
+                await message.answer_media_group(media)
+            elif isinstance(drawing_result, io.BytesIO):
+                drawing_result.seek(0)  # Сбросить указатель на начало
+                # Создаем BufferedInputFile с использованием BytesIO
+                buffered_file = BufferedInputFile(drawing_result.read(), filename='drawing.png')
+                await message.answer_photo(buffered_file, caption='Here is your drawing!')
             else:
-                await message.answer_photo(InputFile(drawing_result))
+                # Обрабатываем случай, когда drawing_result ожидается как путь к файлу или URL
+                await message.answer_photo(BufferedInputFile(drawing_result), caption='Here is your drawing!')
 
-            await message.bot.send_message(
-                chat_id=config.Chat.CHAT_DRAWING_LOGS,
-                text=f'<b>🔔 ⬇️ Новая отрисовка ⬇️\n\n'
-                     f'🥷 Юзер: @{message.from_user.username}\n'
-                     f'📜 Шаблон: <u>{selected_template.name}</u></b>',
-                parse_mode="HTML"
-            )
-
+        except Exception as e:
+            logging.error(f"Error generating image: {e}")
+            await message.reply(text='<b>⛔️ Произошла ошибка при генерации изображения</b>', parse_mode='HTML')
         finally:
-            await state.reset_state(with_data=False)
+            pass  # Здесь не очищаем состояние
 
     @classmethod
     async def hook_process_backward_buttons(cls, call: CallbackQuery, state: FSMContext, context):
@@ -530,7 +572,15 @@ class DrawWizardMenu(DynamicMenu):
             state='*'
         )
         dp.register_message_handler(
-            cls.generate_image, state=WAITING_TICKET_DATA, chat_type='private'
+            cls.generate_image,
+            state=WAITING_TICKET_DATA
+        )
+
+        # Handler for backward navigation
+        dp.register_callback_query_handler(
+            cls.hook_process_backward_buttons,
+            lambda call: call.data.startswith('goto:'),
+            state='*'
         )
 
     @classmethod

@@ -19,6 +19,11 @@ async def get_session() -> AsyncSession:  # type: ignore
         yield session
 
 
+async def get_async_session() -> AsyncSession:
+    # This function returns a session directly
+    return async_session()
+
+
 async def init_models():
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

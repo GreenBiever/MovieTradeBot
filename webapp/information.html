@@ -24,6 +24,26 @@
           <p><span class="label">• Обнал: </span><span class="value" id="withdrawal_payment">...</span></p>
 
         </div>
+        <h1 class="notifications-label">Уведомления</h1>
+        <!-- Уведомления -->
+        <div class="notifications">
+            <div class="toggle">
+                <span class="label">Платежные:</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="payment_notifications" onchange="toggleNotification('payment', this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="toggle">
+                <span class="label">Навигационные:</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="navigation_notifications" onchange="toggleNotification('navigation', this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+
         <label>Информация о проекте</label>
         <div class="project_information"></div>
 
@@ -43,8 +63,18 @@
       </div>
     </div>
     <script>
+      
+      // Функция для получения параметров из URL
+      function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                tg_id: params.get('id')
+            };
+        }
       const params1 = new URLSearchParams(window.location.search);
       const id = params1.get('id');
+
+      
   
       // Если id существует, обновляем ссылки
       if (id) {
@@ -117,14 +147,63 @@
         }
       }
 
-
+      // Функция для получения данных пользователя
+      async function fetchUserData(tg_id) {
+            try {
+                const response = await fetch(`/user/${tg_id}`);
+                if (!response.ok) {
+                    throw new Error('Ошибка загрузки данных');
+                }
+                const data = await response.json();
+                console.log(data);
+                
+                // Уведомления
+                document.getElementById('payment_notifications').checked = data.payment_notifications;
+                document.getElementById('navigation_notifications').checked = data.navigation_notifications;
+            } catch (error) {
+                console.error('Ошибка:', error);
+            }
+        }
   
       // Вызываем функцию для обновления информации
+      window.onload = function() {
+            const { tg_id } = getUrlParams();
+            if (tg_id) {
+                fetchUserData(tg_id);
+            } else {
+                console.error('TG ID не найден в URL');
+            }
+        }
       updateUserRankInfo(id);
   </script>
-  
-  <script>
-
-  </script>
+    <script>
+        async function toggleNotification(type, isChecked) {
+            const params = new URLSearchParams(window.location.search);
+            const tg_id = params.get('id')
+            const url = `/user/${tg_id}/notifications`;
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        notification_type: type,
+                        status: isChecked
+                    })
+                });
+    
+                if (response.ok) {
+                    const result = await response.text();
+                    console.log(result); // Можно обновить UI или показать уведомление
+                } else {
+                    console.error('Ошибка при отправке запроса');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+            }
+        }
+    </script>
 </body>
 </html>

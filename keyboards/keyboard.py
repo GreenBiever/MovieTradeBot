@@ -17,17 +17,17 @@ async def get_webapp_kb(user_id):
 
 
 main_kb = [
-    [KeyboardButton(text="💎 Главное меню"),
-     KeyboardButton(text="Мои ссылки")],
-    [KeyboardButton(text='Отрисовка'),
-     KeyboardButton(text='Мануалы')]
+    [KeyboardButton(text="💎Главное меню💎")],
+    [KeyboardButton(text="🌍Мои ссылки🌍")],
+    [KeyboardButton(text='👨‍🎨Мастер отрисовки👨‍🎨'),
+     KeyboardButton(text='🛡О проекте🛡')]
 ]
 
 main_admin_kb = [
-    [KeyboardButton(text="💎 Главное меню"),
-     KeyboardButton(text="Мои ссылки")],
-    [KeyboardButton(text='Отрисовка'),
-     KeyboardButton(text='Мануалы')],
+    [KeyboardButton(text="💎Главное меню💎")],
+    [KeyboardButton(text="🌍Мои ссылки🌍")],
+    [KeyboardButton(text='👨‍🎨Мастер отрисовки👨‍🎨'),
+     KeyboardButton(text='🛡О проекте🛡')],
     [KeyboardButton(text='Админ-панель')]
 ]
 
