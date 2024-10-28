@@ -44,7 +44,7 @@ async def get_promocode_types(session: AsyncSession) -> Sequence:
 
 
 async def get_hosting_website(session, website_type) -> Sequence:
-    result = await session.execute(select(Hosting_Website).where(Hosting_Website.id == website_type))
+    result = await session.execute(select(Hosting_Website).where(Hosting_Website.type == website_type))
     host_website = result.scalars().first()
     domain = await session.execute(select(Domains.domain).where(Domains.id == host_website.main_domain_id))
     return domain.scalars().first()
@@ -70,10 +70,10 @@ async def init_db(session: AsyncSession):
     result = await session.execute(select(UserCodeType))
     if not result.scalars().all():  # Если таблица пустая
         await session.execute(insert(UserCodeType).values([
-            {'id': 1, 'name': 'Антикино'},
-            {'id': 2, 'name': 'Театр'},
-            {'id': 3, 'name': 'Выставки'},
-            {'id': 4, 'name': 'Трейд'},
+            {'id': 1, 'name': 'Cinema'},
+            {'id': 2, 'name': 'Theatre'},
+            {'id': 3, 'name': 'Exhibitions'},
+            {'id': 4, 'name': 'Trade'},
             {'id': 5, 'name': 'BlaBlaCar'}
         ]))
 
@@ -113,11 +113,12 @@ async def init_db(session: AsyncSession):
     if not result.scalars().all():
         # Если таблица пустая
         await session.execute(insert(Hosting_Website).values([
-            {'id': 1, 'name': 'Antikino', 'main_domain_id': 1},
-            {'id': 2, 'name': 'Theatre', 'main_domain_id': 2},
-            {'id': 3, 'name': 'Exhibition', 'main_domain_id': 3},
-            {'id': 4, 'name': 'Trade', 'main_domain_id': 4},
-            {'id': 5, 'name': 'BlaBlaCar', 'main_domain_id': 5}
+            {'id': 1, 'name': 'Antikino', 'type': 1, 'main_domain_id': 1},
+            {'id': 2, 'name': 'Theatre', 'type': 2, 'main_domain_id': 2},
+            {'id': 3, 'name': 'Exhibition', 'type': 3, 'main_domain_id': 3},
+            {'id': 4, 'name': 'Trade', 'type': 4, 'main_domain_id': 4},
+            {'id': 5, 'name': 'BlaBlaCar', 'type': 5, 'main_domain_id': 5},
+            {'id': 6, 'name': 'Payment', 'type': 6, 'main_domain_id': 6}
         ]))
 
     result = await session.execute(select(Domains))

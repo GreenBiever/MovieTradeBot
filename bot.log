@@ -1070,3 +1070,25 @@ Stack (most recent call last):
 2024-10-28 00:43:33,446 - ERROR - Error generating image: Could not locate a bind configured on mapper Mapper[Domains(domains)], SQL expression or this Session.
 2024-10-28 00:43:33,498 - INFO - Update id=27487079 is handled. Duration 92 ms by bot id=8177988973
 2024-10-28 00:43:33,498 - INFO - Update processed successfully.
+2024-10-28 11:53:33,831 - INFO - Received webhook update: {'update_id': 27487080, 'message': {'message_id': 1383, 'from': {'id': 1460183114, 'is_bot': False, 'first_name': 'Zelenyi', 'last_name': 'Rog', 'username': 'zelen135', 'language_code': 'ru'}, 'chat': {'id': 1460183114, 'first_name': 'Zelenyi', 'last_name': 'Rog', 'username': 'zelen135', 'type': 'private'}, 'date': 1730116413, 'text': '/start', 'entities': [{'offset': 0, 'length': 6, 'type': 'bot_command'}]}}
+2024-10-28 11:53:34,816 - INFO - Update id=27487080 is handled. Duration 984 ms by bot id=8177988973
+2024-10-28 11:53:34,816 - INFO - Update processed successfully.
+2024-10-28 11:53:36,355 - INFO - Received webhook update: {'update_id': 27487081, 'message': {'message_id': 1386, 'from': {'id': 1460183114, 'is_bot': False, 'first_name': 'Zelenyi', 'last_name': 'Rog', 'username': 'zelen135', 'language_code': 'ru'}, 'chat': {'id': 1460183114, 'first_name': 'Zelenyi', 'last_name': 'Rog', 'username': 'zelen135', 'type': 'private'}, 'date': 1730116416, 'text': '👨\u200d🎨Мастер отрисовки👨\u200d🎨'}}
+2024-10-28 11:53:36,513 - INFO - Update id=27487081 is handled. Duration 157 ms by bot id=8177988973
+2024-10-28 11:53:36,513 - INFO - Update processed successfully.
+2024-10-28 11:53:39,214 - INFO - Received webhook update: {'update_id': 27487082, 'message': {'message_id': 1389, 'from': {'id': 1460183114, 'is_bot': False, 'first_name': 'Zelenyi', 'last_name': 'Rog', 'username': 'zelen135', 'language_code': 'ru'}, 'chat': {'id': 1460183114, 'first_name': 'Zelenyi', 'last_name': 'Rog', 'username': 'zelen135', 'type': 'private'}, 'date': 1730116419, 'text': '💎Главное меню💎'}}
+2024-10-28 11:53:39,726 - INFO - Update id=27487082 is handled. Duration 515 ms by bot id=8177988973
+2024-10-28 11:53:39,726 - INFO - Update processed successfully.
+2024-10-28 12:00:10,602 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000019D0B4DF350>
+2024-10-28 12:00:23,404 - INFO - Received webhook update: {'update_id': 27487083, 'message': {'message_id': 1391, 'from': {'id': 1460183114, 'is_bot': False, 'first_name': 'Zelenyi', 'last_name': 'Rog', 'username': 'zelen135', 'language_code': 'ru'}, 'chat': {'id': 1460183114, 'first_name': 'Zelenyi', 'last_name': 'Rog', 'username': 'zelen135', 'type': 'private'}, 'date': 1730116823, 'text': '/start', 'entities': [{'offset': 0, 'length': 6, 'type': 'bot_command'}]}}
+2024-10-28 12:00:24,152 - INFO - Update id=27487083 is handled. Duration 750 ms by bot id=8177988973
+2024-10-28 12:00:24,152 - INFO - Update processed successfully.
+2024-10-28 12:01:39,637 - INFO - Received webhook update: {'update_id': 27487084, 'message': {'message_id': 1394, 'from': {'id': 1460183114, 'is_bot': False, 'first_name': 'Zelenyi', 'last_name': 'Rog', 'username': 'zelen135', 'language_code': 'ru'}, 'chat': {'id': 1460183114, 'first_name': 'Zelenyi', 'last_name': 'Rog', 'username': 'zelen135', 'type': 'private'}, 'date': 1730116899, 'text': '💎Главное меню💎'}}
+2024-10-28 12:01:40,197 - INFO - Update id=27487084 is handled. Duration 562 ms by bot id=8177988973
+2024-10-28 12:01:40,197 - INFO - Update processed successfully.
+2024-10-28 12:04:52,864 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001B99F626A80>
+2024-10-28 12:04:52,864 - ERROR - Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x000001B99F62F4D0>, 616337.359)]']
+connector: <aiohttp.connector.TCPConnector object at 0x000001B99F65B920>

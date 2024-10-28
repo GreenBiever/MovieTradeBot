@@ -11,7 +11,7 @@ BOT_URL = environ.get('BOT_URL')
 ADMIN_IDS = ['1460183114']
 
 TELEGRAM_WEBHOOK_PATH = '/telegram_webhook/'
-WEBHOOK_URL = 'https://60db-82-7-67-196.ngrok-free.app'
+WEBHOOK_URL = 'https://db0e-82-7-67-196.ngrok-free.app'
 WEBHOOK_PORT = 8080
 API_VERSION = 'v1'
 API_PATH = f'/api/{API_VERSION}'

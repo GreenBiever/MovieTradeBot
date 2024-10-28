@@ -206,6 +206,7 @@ class Hosting_Website(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     config_key: Mapped[str] = mapped_column(String(255), nullable=True, unique=True)
+    type: Mapped[int] = mapped_column(nullable=False)
     config_schema: Mapped[str] = mapped_column(Text, nullable=True)
     main_domain_id: Mapped[int] = mapped_column(ForeignKey('domains.id'))
 
