@@ -12,11 +12,13 @@ from aiogram.fsm.context import FSMContext
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import update, select
 from main import bot as Bot
+
 router = Router()
 router.message.middleware(AuthorizeMiddleware())
 router.callback_query.middleware(AuthorizeMiddleware())
 
 bot = Bot
+
 
 class SendApplication(StatesGroup):
     first_question = State()

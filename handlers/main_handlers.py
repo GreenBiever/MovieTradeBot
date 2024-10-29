@@ -59,6 +59,10 @@ async def set_template_handler(call: CallbackQuery, state: FSMContext, user: Use
     await DrawWizardMenu.set_template(call=call, state=state, session=session, user=user)
 
 
+@router.callback_query(F.data.startswith('goto:'))
+async def process_backward_buttons(call: CallbackQuery, state: FSMContext, context):
+    await DrawWizardMenu.hook_process_backward_buttons(call=call, state=state, context=context)
+
 @router.message(StateFilter('DrawWizard:WAITING_TICKET_DATA'))
 async def process_ticket_data(message: Message, state: FSMContext, user: User, session: AsyncSession):
     await DrawWizardMenu.generate_image(message=message, state=state, session=session, user=user)

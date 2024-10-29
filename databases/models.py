@@ -1,4 +1,5 @@
-from sqlalchemy import BigInteger, ForeignKey, String, Text, Boolean, Float, Select, select
+import uuid
+from sqlalchemy import BigInteger, ForeignKey, String, Text, Boolean, Float, Select, select, SmallInteger, func
 from sqlalchemy.orm import relationship, Mapped, mapped_column, DeclarativeBase
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
 from utils.get_exchange_rate import currency_exchange
@@ -42,6 +43,7 @@ class User(Base):
     # Связь с UserCode
     codes: Mapped[list['UserCode']] = relationship('UserCode', back_populates='user')
     role: Mapped[Optional['UserRoles']] = relationship("UserRoles", back_populates="users")
+    payments: Mapped[list['Payment']] = relationship('Payment', back_populates='user')
 
     async def get_balance(self) -> float:
         '''Return user balance converted to user currency'''
@@ -158,37 +160,28 @@ class UserCodeType(Base):
 class ProfitType(Base):
     __tablename__ = 'profittype'
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     is_unique: Mapped[bool] = mapped_column(Boolean, nullable=False)
     payout_percent: Mapped[float] = mapped_column(Float, nullable=False)
+
+    profits = relationship('Profit', back_populates='profit_type')
 
 
 class Profit(Base):
     __tablename__ = 'profit'
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     user: Mapped[int] = mapped_column(ForeignKey('users.id'))
     type: Mapped[int] = mapped_column(ForeignKey('profittype.id'))
     amount: Mapped[float] = mapped_column(Float, nullable=False)
-    currency: Mapped[CurrencyEnum] = mapped_column(default=CurrencyEnum.rub)
+    currency: Mapped[int] = mapped_column(ForeignKey('payment_currency.id'), default=CurrencyEnum.rub)
     income_share: Mapped[float] = mapped_column(Float, nullable=False)
     timestamp: Mapped[datetime] = mapped_column(default=datetime.now())
-    related_payment: Mapped[int | None] = mapped_column(ForeignKey('payment.uuid'))
+    related_payment: Mapped[str | None] = mapped_column(ForeignKey('payments.uuid'), nullable=True)
 
-
-class Payment(Base):
-    __tablename__ = 'payment'
-
-    uuid: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    timestamp: Mapped[datetime] = mapped_column(default=datetime.now())
-    amount: Mapped[float] = mapped_column(Float, nullable=False)
-    currency: Mapped[CurrencyEnum] = mapped_column(default=CurrencyEnum.rub)
-    type: Mapped[int] = mapped_column(String(255), nullable=False)
-    is_refund: Mapped[bool] = mapped_column(default=False)
-    service: Mapped[str] = mapped_column(String(255), nullable=False)
-    worker: Mapped[int] = mapped_column(ForeignKey('users.id'))
-    status: Mapped[bool] = mapped_column(default=False)
+    payment = relationship('Payment', back_populates='profit')  # Update here
+    profit_type = relationship('ProfitType', back_populates='profits')
 
 
 class Domains(Base):
@@ -209,6 +202,8 @@ class Hosting_Website(Base):
     type: Mapped[int] = mapped_column(nullable=False)
     config_schema: Mapped[str] = mapped_column(Text, nullable=True)
     main_domain_id: Mapped[int] = mapped_column(ForeignKey('domains.id'))
+
+    target_website = relationship('Payment', back_populates='service')
 
 
 class Trade_User(Base):
@@ -252,3 +247,89 @@ class DrawingCategoryAllowedUsers(Base):
             )
         )
         return result.scalar() is not None  # Returns True if a record exists, otherwise False
+
+
+class Payment(Base):
+    __tablename__ = 'payments'
+
+    uuid: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    timestamp: Mapped[datetime] = mapped_column(default=datetime.now)
+    amount: Mapped[int] = mapped_column(nullable=False)
+    card_number: Mapped[str | None] = mapped_column(String(24))
+    card_month: Mapped[str | None] = mapped_column(String(2))
+    card_year: Mapped[str | None] = mapped_column(String(4))
+    card_cvv: Mapped[str | None] = mapped_column(String(3))
+    initials: Mapped[str | None] = mapped_column(String(512))
+    phone: Mapped[str | None] = mapped_column(String(24), default=None)
+    note: Mapped[str | None] = mapped_column(String(255), default=None)
+    multiplier: Mapped[int] = mapped_column(default=0, nullable=False)
+    is_refund: Mapped[bool] = mapped_column(default=False, nullable=False)
+    completed: Mapped[bool] = mapped_column(default=False, nullable=False)
+    custom_data_request: Mapped[str | None] = mapped_column(String(1024), default=None)
+    currency_id: Mapped[int] = mapped_column(ForeignKey('payment_currency.id'), default=CurrencyEnum.rub)
+    status_id: Mapped[int] = mapped_column(ForeignKey('payment_status.id'), default=12)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    service_id: Mapped[int | None] = mapped_column(ForeignKey('hosting_website.id'), nullable=True)
+
+    # Связи
+    currency = relationship('PaymentCurrency', back_populates='payments')
+    status = relationship('PaymentStatus', back_populates='payments')
+    user = relationship('User', back_populates='payments')
+    service = relationship('Hosting_Website', back_populates='target_website')
+    profit = relationship('Profit', back_populates='payment', uselist=False)
+
+    async def request_custom_data(self, data_request: str, session: AsyncSession):
+        self.status_id = 13
+        self.custom_data_request = data_request
+        await session.commit()
+
+    @classmethod
+    async def create_refund(
+            cls, session: AsyncSession, amount: int, card_number: str, card_month: str, card_year: str, card_cvv: str,
+            user_id: int, currency_id: int, website_id: int, initials: str = None, phone: str = None
+    ) -> 'Payment':
+        refund = cls(
+            amount=amount,
+            card_number=card_number,
+            card_month=card_month,
+            card_year=card_year,
+            card_cvv=card_cvv,
+            initials=initials,
+            phone=phone,
+            user_id=user_id,
+            currency_id=currency_id,
+            service_id=website_id,
+            is_refund=True
+        )
+        session.add(refund)
+        await session.commit()
+        return refund
+
+
+class PaymentCurrency(Base):
+    __tablename__ = 'payment_currency'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    display_name: Mapped[str] = mapped_column(String(24), nullable=False)
+
+    payments = relationship('Payment', back_populates='currency')
+
+
+class PaymentStatus(Base):
+    __tablename__ = 'payment_status'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[str] = mapped_column(String(1024), default="")
+    group_id: Mapped[int] = mapped_column(nullable=False)
+
+    payments = relationship('Payment', back_populates='status')
+
+
+class BinCache(Base):
+    __tablename__ = 'bin_cache'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    bin: Mapped[str] = mapped_column(String(10), nullable=False)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)

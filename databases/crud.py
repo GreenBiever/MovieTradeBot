@@ -3,7 +3,8 @@ from typing import List, Sequence
 from sqlalchemy import select, update, insert, delete
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
-from databases.models import User, UserCode, Hosting_Website, UserCodeType, Domains, ProfitType, UserGroup, UserRoles, DrawingCategory
+from databases.models import User, UserCode, Hosting_Website, UserCodeType, Domains, ProfitType, UserGroup, UserRoles, \
+    DrawingCategory
 from databases.enums import CurrencyEnum
 from aiogram import Bot
 from keyboards import keyboard
@@ -56,6 +57,18 @@ async def get_promocode_by_name(session, promocode_name) -> UserCode | None:
 
 
 async def init_db(session: AsyncSession):
+    result = await session.execute(select(Domains))
+    if not result.scalars().all():
+        # Если таблица пустая
+        await session.execute(insert(Domains).values([
+            {'id': 1, 'domain': 'antikino.com'},
+            {'id': 2, 'domain': 'theatre.com'},
+            {'id': 3, 'domain': 'exhibition.com'},
+            {'id': 4, 'domain': 'trade.com'},
+            {'id': 5, 'domain': 'blablacar.com'},
+            {'id': 6, 'domain': 'payment.com'}
+        ]))
+
     result = await session.execute(select(ProfitType))
     if not result.scalars().all():  # Если таблица пустая
         await session.execute(insert(ProfitType).values([
@@ -74,7 +87,8 @@ async def init_db(session: AsyncSession):
             {'id': 2, 'name': 'Theatre'},
             {'id': 3, 'name': 'Exhibitions'},
             {'id': 4, 'name': 'Trade'},
-            {'id': 5, 'name': 'BlaBlaCar'}
+            {'id': 5, 'name': 'BlaBlaCar'},
+            {'id': 6, 'name': 'Payment'}
         ]))
 
     # Проверка и вставка данных в таблицу UserGroup
@@ -121,14 +135,4 @@ async def init_db(session: AsyncSession):
             {'id': 6, 'name': 'Payment', 'type': 6, 'main_domain_id': 6}
         ]))
 
-    result = await session.execute(select(Domains))
-    if not result.scalars().all():
-        # Если таблица пустая
-        await session.execute(insert(Domains).values([
-            {'id': 1, 'domain': 'antikino.com'},
-            {'id': 2, 'domain': 'theatre.com'},
-            {'id': 3, 'domain': 'exhibition.com'},
-            {'id': 4, 'domain': 'trade.com'},
-            {'id': 5, 'domain': 'blablacar.com'}
-        ]))
     await session.commit()  # Коммит изменений вне контекста session.begin()

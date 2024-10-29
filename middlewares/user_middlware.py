@@ -34,7 +34,6 @@ class AuthorizeMiddleware(BaseMiddleware):
 
                     await session.refresh(user, ['referer'])
                     if referer and referer is not user and user.referer is None:
-                        user.currency = referer.currency_for_referals
                         session.add(user)
                         await session.commit()
                         await register_referal(session, referer, user,
