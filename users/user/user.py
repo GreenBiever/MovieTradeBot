@@ -13,10 +13,13 @@ from ..group.group import UserGroup
 from ..role.role import UserRole
 from ..ref_code.ref_code import RefCode
 
+
 class UserBase:
     pass
 
+
 UserT = TypeVar('UserT', bound=UserBase)
+
 
 class UserDefault(UserBase):
 

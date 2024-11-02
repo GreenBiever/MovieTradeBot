@@ -1,26 +1,27 @@
 from typing import Union
-from .models.traffic_source import TrafficSource as TrafficSourceDbModel
-
 
 class TrafficSource:
 
-    def __init__(self, traffic_source_db_instance: TrafficSourceDbModel):
+    def __init__(self, traffic_source_db_instance):
         self._traffic_source_db_instance = traffic_source_db_instance
 
     @classmethod
     async def create(cls, name: str, description: str):
+        from .models.traffic_source import TrafficSource as TrafficSourceDbModel  # Отложенный импорт
         return cls.from_db_instance(await TrafficSourceDbModel.create(name, description))
 
     @classmethod
     async def get_all(cls) -> list['TrafficSource']:
+        from .models.traffic_source import TrafficSource as TrafficSourceDbModel  # Отложенный импорт
         return [cls.from_db_instance(role) for role in await TrafficSourceDbModel.get_all()]
 
     @classmethod
-    def from_db_instance(cls, traffic_source_db_instance: TrafficSourceDbModel) -> 'TrafficSource':
+    def from_db_instance(cls, traffic_source_db_instance) -> 'TrafficSource':
         return cls(traffic_source_db_instance)
 
     @classmethod
-    async def get_by_id(cls, role_id: int) -> Union['TrafficSourceDbModel', None]:
+    async def get_by_id(cls, role_id: int) -> Union['TrafficSource', None]:
+        from .models.traffic_source import TrafficSource as TrafficSourceDbModel  # Отложенный импорт
         return cls.from_db_instance(await TrafficSourceDbModel.get_by_id(role_id))
 
     @property
@@ -45,7 +46,7 @@ class TrafficSource:
         await self._traffic_source_db_instance.set_description(description)
 
     def __str__(self):
-        return f"UserRole(id={self.id}, name='{self.name}')"
+        return f"TrafficSource(id={self.id}, name='{self.name}')"
 
     def __repr__(self):
         return self.__str__()

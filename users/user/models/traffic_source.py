@@ -27,7 +27,8 @@ class TrafficSource:
 
     @classmethod
     async def get_by_id(cls, session: AsyncSession, traffic_source_id: int) -> Optional['TrafficSource']:
-        result = await session.execute(select(TrafficSourceORMModel).where(TrafficSourceORMModel.id == traffic_source_id))
+        result = await session.execute(
+            select(TrafficSourceORMModel).where(TrafficSourceORMModel.id == traffic_source_id))
         traffic_source = result.scalar_one_or_none()
         return cls.from_db_instance(traffic_source) if traffic_source else None
 
