@@ -24,3 +24,6 @@ router = APIRouter()
 #     type = promocode.type_id
 #     domain_config = promocode.domain_config
 #     return {'id': id, 'name': name, 'type': type, "config": domain_config}
+
+
+

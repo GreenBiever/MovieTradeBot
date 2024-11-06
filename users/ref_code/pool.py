@@ -5,7 +5,7 @@ from sqlalchemy.sql.expression import func
 from databases.models import UserCode as RefCodeORMModel
 from .models.ref_code import RefCode as RefCodeDbModel
 from .ref_code import RefCode
-from ..user.models.filtering import get_inactive_user_filter_by_profits
+
 
 
 class RefCodePool:
@@ -43,23 +43,6 @@ class RefCodePool:
         )
         ref_codes_filtered = result.scalars().all()
         return cls._get_ref_code_instances_from_orm_obj_list(ref_codes_filtered)
-
-    @classmethod
-    async def get_with_inactive_user(
-            cls, session: AsyncSession, count: int, min_days_inactive: int = 30, min_days_in_team: int = 60
-    ) -> List[RefCode]:
-        inactive_users_query = get_inactive_user_filter_by_profits(session, min_days_inactive, min_days_in_team)
-        inactive_user_ids = [user.id for user in (await session.execute(inactive_users_query)).scalars().all()]
-
-        ref_code_query = (
-            select(RefCodeORMModel)
-            .where(RefCodeORMModel.user_id.in_(inactive_user_ids))
-            .order_by(func.random())  # аналог Rand() в Tortoise
-            .limit(count)
-        )
-
-        ref_code_orm_obj_list = (await session.execute(ref_code_query)).scalars().all()
-        return cls._get_ref_code_instances_from_orm_obj_list(ref_code_orm_obj_list)
 
     @classmethod
     def _get_ref_code_instances_from_orm_obj_list(cls, ref_code_orm_obj_list: List[RefCodeORMModel]) -> List[RefCode]:

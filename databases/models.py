@@ -168,23 +168,22 @@ class ProfitType(Base):
     is_unique: Mapped[bool] = mapped_column(Boolean, nullable=False)
     payout_percent: Mapped[float] = mapped_column(Float, nullable=False)
 
-    profits = relationship('Profit', back_populates='profit_type')
 
-
-class Profit(Base):
-    __tablename__ = 'profit'
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    user: Mapped[int] = mapped_column(ForeignKey('users.id'))
-    type: Mapped[int] = mapped_column(ForeignKey('profittype.id'))
-    amount: Mapped[float] = mapped_column(Float, nullable=False)
-    currency: Mapped[int] = mapped_column(ForeignKey('payment_currency.id'), default=CurrencyEnum.rub)
-    income_share: Mapped[float] = mapped_column(Float, nullable=False)
-    timestamp: Mapped[datetime] = mapped_column(default=datetime.now())
-    related_payment: Mapped[str | None] = mapped_column(ForeignKey('payments.uuid'), nullable=True)
-
-    # payment = relationship('Payment', back_populates='profit')  # Update here
-    profit_type = relationship('ProfitType', back_populates='profits')
+#
+# class Profit(Base):
+#     __tablename__ = 'profit'
+#
+#     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+#     user: Mapped[int] = mapped_column(ForeignKey('users.id'))
+#     type: Mapped[int] = mapped_column(ForeignKey('profittype.id'))
+#     amount: Mapped[float] = mapped_column(Float, nullable=False)
+#     currency: Mapped[int] = mapped_column(ForeignKey('payment_currency.id'), default=CurrencyEnum.rub)
+#     income_share: Mapped[float] = mapped_column(Float, nullable=False)
+#     timestamp: Mapped[datetime] = mapped_column(default=datetime.now())
+#     related_payment: Mapped[str | None] = mapped_column(ForeignKey('payments.uuid'), nullable=True)
+#
+#     # payment = relationship('Payment', back_populates='profit')  # Update here
+#     profit_type = relationship('ProfitType', back_populates='profits')
 
 
 class Domains(Base):
@@ -212,7 +211,7 @@ class Hosting_Website(Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     config_key: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, unique=True)
     type: Mapped[int] = mapped_column(Integer, nullable=False)
-    config_schema: Mapped[Optional[dict]] = mapped_column(String, nullable=True)
+    config_schema: Mapped[Optional[dict]] = mapped_column(String(1024), nullable=True)
     main_domain_id: Mapped[Optional[int]] = mapped_column(ForeignKey('domains.id'))
     is_activated: Mapped[bool] = mapped_column(default=True)
 
